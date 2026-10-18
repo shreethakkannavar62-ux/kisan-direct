@@ -42,6 +42,7 @@
                 <a href="{{ url_for('mandi_prices') }}" class="nav-link {% if request.path == '/mandi-prices' %}active{% endif %}">Mandi Benchmarks</a>
                 <a href="{{ url_for('farmers_directory') }}" class="nav-link {% if request.path == '/farmers' %}active{% endif %}">Farmers Directory</a>
                 <a href="{{ url_for('farming_tips') }}" class="nav-link {% if request.path == '/tips' %}active{% endif %}">Agri Tips</a>
+                <a href="{{ url_for('weather_view') }}" class="nav-link {% if request.path == '/weather' %}active{% endif %}">🌦️ Weather</a>
                 
                 {% if session.get('user_id') %}
                     {% if session.get('role') == 'farmer' %}
