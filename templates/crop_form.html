@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Crop Listing' if action == 'edit' else 'Add New Crop Listing' }}{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <div style="max-width: 760px; margin: 0 auto 20px;">
+        <span style="font-size: 13px; color: var(--text-muted);"><a href="{{ url_for('farmer_dashboard') }}">&larr; Back to Farmer Portal</a></span>
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin-top: 6px;">
+            {{ 'Edit Crop Listing: ' ~ crop.crop_name if action == 'edit' else 'List a New Crop Harvest' }}
+        </h1>
+        <p style="color: var(--text-muted); font-size: 14.5px;">
+            Provide transparent pricing, harvest quality, and stock availability to connect directly with consumers.
+        </p>
+    </div>
+
+    <div class="form-card wide" style="margin-top: 0;">
+        <form method="POST">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="crop_name">Crop Name *</label>
+                    <input type="text" id="crop_name" name="crop_name" placeholder="e.g. Fresh Red Onions, Sharbati Wheat, Alphonso Mangoes" value="{{ crop.crop_name if crop else '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="Vegetables" {% if crop and crop.category == 'Vegetables' %}selected{% endif %}>Vegetables</option>
+                        <option value="Fruits" {% if crop and crop.category == 'Fruits' %}selected{% endif %}>Fruits</option>
+                        <option value="Grains & Pulses" {% if crop and crop.category == 'Grains & Pulses' %}selected{% endif %}>Grains &amp; Pulses</option>
+                        <option value="Spices & Herbs" {% if crop and crop.category == 'Spices & Herbs' %}selected{% endif %}>Spices &amp; Herbs</option>
+                        <option value="Organic Specials" {% if crop and crop.category == 'Organic Specials' %}selected{% endif %}>Organic Specials</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="variety">Variety / Grade</label>
+                    <input type="text" id="variety" name="variety" placeholder="e.g. Desi Hybrid, Grade A Export, Sharbati 306" value="{{ crop.variety if crop else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="image_emoji">Crop Visual Icon</label>
+                    <select id="image_emoji" name="image_emoji">
+                        <option value="🍅" {% if crop and crop.image_emoji == '🍅' %}selected{% endif %}>🍅 Tomatoes</option>
+                        <option value="🧅" {% if crop and crop.image_emoji == '🧅' %}selected{% endif %}>🧅 Onions</option>
+                        <option value="🥔" {% if crop and crop.image_emoji == '🥔' %}selected{% endif %}>🥔 Potatoes</option>
+                        <option value="🫑" {% if crop and crop.image_emoji == '🫑' %}selected{% endif %}>🫑 Capsicum</option>
+                        <option value="🌽" {% if crop and crop.image_emoji == '🌽' %}selected{% endif %}>🌽 Corn / Maize</option>
+                        <option value="🌶️" {% if crop and crop.image_emoji == '🌶️' %}selected{% endif %}>🌶️ Chillies</option>
+                        <option value="🍇" {% if crop and crop.image_emoji == '🍇' %}selected{% endif %}>🍇 Grapes</option>
+                        <option value="🍎" {% if crop and crop.image_emoji == '🍎' %}selected{% endif %}>🍎 Apples / Pomegranates</option>
+                        <option value="🥭" {% if crop and crop.image_emoji == '🥭' %}selected{% endif %}>🥭 Mangoes</option>
+                        <option value="🌾" {% if crop and crop.image_emoji == '🌾' or not crop %}selected{% endif %}>🌾 Wheat / Grains</option>
+                        <option value="🍚" {% if crop and crop.image_emoji == '🍚' %}selected{% endif %}>🍚 Rice / Paddy</option>
+                        <option value="🫚" {% if crop and crop.image_emoji == '🫚' %}selected{% endif %}>🫚 Ginger / Turmeric</option>
+                        <option value="🌱" {% if crop and crop.image_emoji == '🌱' %}selected{% endif %}>🌱 Seeds / Pulses</option>
+                        <option value="🧈" {% if crop and crop.image_emoji == '🧈' %}selected{% endif %}>🧈 Dairy / Ghee</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price_per_unit">Direct Price (₹) *</label>
+                    <input type="number" step="0.5" min="0.5" id="price_per_unit" name="price_per_unit" placeholder="e.g. 28.00" value="{{ crop.price_per_unit if crop else '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="unit">Pricing Unit *</label>
+                    <select id="unit" name="unit" required>
+                        <option value="kg" {% if crop and crop.unit == 'kg' %}selected{% endif %}>kg (Kilogram)</option>
+                        <option value="quintal" {% if crop and crop.unit == 'quintal' %}selected{% endif %}>quintal (100 kg)</option>
+                        <option value="dozen" {% if crop and crop.unit == 'dozen' %}selected{% endif %}>dozen (Units)</option>
+                        <option value="box" {% if crop and crop.unit == 'box' %}selected{% endif %}>box / crate</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="available_qty">Available Stock Quantity *</label>
+                    <input type="number" step="0.5" min="0" id="available_qty" name="available_qty" placeholder="e.g. 500" value="{{ crop.available_qty if crop else '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="min_order_qty">Minimum Order Quantity *</label>
+                    <input type="number" step="0.5" min="1" id="min_order_qty" name="min_order_qty" placeholder="e.g. 5" value="{{ crop.min_order_qty if crop else '1' }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="harvest_date">Harvest / Picking Date</label>
+                    <input type="date" id="harvest_date" name="harvest_date" value="{{ crop.harvest_date if crop else '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="status">Stock Status *</label>
+                    <select id="status" name="status" required>
+                        <option value="Available Now" {% if crop and crop.status == 'Available Now' %}selected{% endif %}>Available Now (Ready)</option>
+                        <option value="Harvesting This Week" {% if crop and crop.status == 'Harvesting This Week' %}selected{% endif %}>Harvesting This Week</option>
+                        <option value="Pre-Order / Upcoming" {% if crop and crop.status == 'Pre-Order / Upcoming' %}selected{% endif %}>Pre-Order / Upcoming</option>
+                        <option value="Sold Out" {% if crop and crop.status == 'Sold Out' %}selected{% endif %}>Sold Out</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pickup_location">Farm Pickup Point / Nearest Landmark</label>
+                <input type="text" id="pickup_location" name="pickup_location" placeholder="e.g. Farm Gate No. 2, Near Village Panchayat Hall" value="{{ crop.pickup_location if crop else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Harvest Description &amp; Quality Notes</label>
+                <textarea id="description" name="description" rows="4" placeholder="Describe quality, pesticide-free practices, freshness, or cooking qualities...">{{ crop.description if crop else '' }}</textarea>
+            </div>
+
+            <!-- Toggles for Organic and Delivery -->
+            <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; display: flex; gap: 30px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 0;">
+                    <input type="checkbox" name="organic" value="1" style="width: 18px; height: 18px;" {% if crop and crop.organic %}checked{% endif %}>
+                    <span>🌿 <strong>100% Chemical-Free / Organic</strong></span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 0;">
+                    <input type="checkbox" name="delivery_available" value="1" style="width: 18px; height: 18px;" {% if not crop or crop.delivery_available %}checked{% endif %}>
+                    <span>🚚 <strong>Delivery / Transport Available</strong></span>
+                </label>
+            </div>
+
+            <div style="display: flex; gap: 14px;">
+                <button type="submit" class="btn btn-primary btn-lg btn-full">
+                    {{ 'Save & Update Crop Listing' if action == 'edit' else 'Publish Crop Listing to Marketplace' }}
+                </button>
+                <a href="{{ url_for('farmer_dashboard') }}" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

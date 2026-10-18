@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Direct Farm-to-Consumer Digital Marketplace{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container hero-content">
+        <div class="hero-badge">
+            <span>✨ 100% Direct Farmer Connect &bull; Zero Intermediary Margins</span>
+        </div>
+        <h1 class="hero-title">
+            Buy Fresh Crops Direct From <span>Local Farmers</span>
+        </h1>
+        <p class="hero-subtitle">
+            Browse verified crop availability, compare fair mandi rates, and directly call or WhatsApp farmers without any commission or broker cuts.
+        </p>
+
+        <!-- Search Form -->
+        <form action="{{ url_for('crops_catalog') }}" method="GET" class="hero-search-card">
+            <span style="font-size: 20px; padding-left: 6px;">🔍</span>
+            <input type="text" name="q" placeholder="Search crops (e.g. Tomatoes, Basmati Rice, Grapes, Onions)..." required>
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary btn-lg">Search Crops</button>
+        </form>
+
+        <!-- Quick Stats -->
+        <div class="hero-stats">
+            <div class="hero-stat-card">
+                <div class="hero-stat-number">{{ total_active_crops }}+</div>
+                <div class="hero-stat-label">Active Crop Batches</div>
+            </div>
+            <div class="hero-stat-card">
+                <div class="hero-stat-number">{{ total_farmers }}</div>
+                <div class="hero-stat-label">Verified Farm Hubs</div>
+            </div>
+            <div class="hero-stat-card">
+                <div class="hero-stat-number">25-35%</div>
+                <div class="hero-stat-label">Direct Consumer Savings</div>
+            </div>
+            <div class="hero-stat-card">
+                <div class="hero-stat-number">0%</div>
+                <div class="hero-stat-label">Brokerage Fee</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Quick Navigation -->
+<section class="section" style="padding-top: 35px; padding-bottom: 20px;">
+    <div class="container">
+        <div class="category-pills">
+            <a href="{{ url_for('crops_catalog') }}" class="pill active">🌾 All Crops</a>
+            {% for cat in categories %}
+                <a href="{{ url_for('crops_catalog', category=cat) }}" class="pill">
+                    {% if cat == 'Vegetables' %}🥦{% elif cat == 'Fruits' %}🍎{% elif cat == 'Grains & Pulses' %}🌾{% elif cat == 'Spices & Herbs' %}🌶️{% else %}✨{% endif %}
+                    {{ cat }}
+                </a>
+            {% endfor %}
+            <a href="{{ url_for('crops_catalog', organic='1') }}" class="pill" style="border-color: #10b981; color: #047857;">
+                🌿 100% Organic Only
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Fresh Crops Section -->
+<section class="section" style="padding-top: 10px;">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Fresh Harvest Available Right Now</h2>
+                <p class="section-subtitle">Direct from verified fields. Connect with the farmer directly via phone or WhatsApp.</p>
+            </div>
+            <a href="{{ url_for('crops_catalog') }}" class="btn btn-secondary">View All {{ total_active_crops }} Crops &rarr;</a>
+        </div>
+
+        <div class="crop-grid">
+            {% for crop in featured_crops %}
+            <div class="crop-card">
+                <div class="crop-card-media">
+                    <span>{{ crop.image_emoji }}</span>
+                    <div class="crop-badges">
+                        {% if crop.organic %}
+                            <span class="badge badge-organic">🌿 Organic</span>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+                        <span class="badge badge-available">{{ crop.status }}</span>
+                    </div>
+                </div>
+
+                <div class="crop-card-body">
+                    <div class="crop-category-tag">{{ crop.category }}</div>
+                    <h3 class="crop-name">
+                        <a href="{{ url_for('crop_detail', crop_id=crop.id) }}">{{ crop.crop_name }}</a>
+                    </h3>
+                    <div class="crop-variety">{{ crop.variety or 'Standard Farm Harvest' }}</div>
+
+                    <div class="crop-price-box">
+                        <div>
+                            <div class="crop-price-val">{{ crop.price_per_unit|currency }}</div>
+                            <div class="crop-price-unit">per {{ crop.unit }}</div>
+                        </div>
+                        <div class="crop-stock">
+                            <div>Stock Available</div>
+                            <strong>{{ crop.available_qty }} {{ crop.unit }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Farmer Contact Snippet -->
+                    <div class="crop-farmer-snippet">
+                        <div class="farmer-name-row">
+                            <strong>👨‍🌾 {{ crop.farmer_name }}</strong>
+                            <span style="font-size: 11px; color:#059669; font-weight:700;">Verified Farmer</span>
+                        </div>
+                        <div class="farmer-loc">
+                            📍 {{ crop.village }}, {{ crop.district }}, {{ crop.state }}
+                        </div>
+                    </div>
+
+                    <!-- Direct Contact Buttons -->
+                    <div class="crop-card-actions">
+                        <a href="tel:{{ crop.farmer_phone }}" class="btn btn-sm btn-call" title="Call Farmer Directly">
+                            📞 Call Farmer
+                        </a>
+                        <button onclick="openWhatsApp('{{ crop.farmer_whatsapp or crop.farmer_phone }}', '{{ crop.crop_name }}', '{{ crop.price_per_unit }}', '{{ crop.farmer_name }}')" class="btn btn-sm btn-whatsapp" title="Message on WhatsApp">
+                            💬 WhatsApp
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 8px;">
+                        <a href="{{ url_for('crop_detail', crop_id=crop.id) }}" class="btn btn-sm btn-secondary btn-full">
+                            View Crop Details & Inquire &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Mandi vs Farmer Direct Price Comparison Showcase -->
+<section class="section" style="background-color: #f1f5f9;">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Transparent Price Advantage</h2>
+                <p class="section-subtitle">Compare local APMC Mandi benchmark rates with direct farmer rates. Farmers earn more, consumers pay less.</p>
+            </div>
+            <a href="{{ url_for('mandi_prices') }}" class="btn btn-secondary">Full Mandi Price List &rarr;</a>
+        </div>
+
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Crop Name</th>
+                            <th>Reference Mandi</th>
+                            <th>District</th>
+                            <th>Mandi Average Rate</th>
+                            <th>KisanDirect Farmer Rate</th>
+                            <th>Consumer Savings</th>
+                            <th>Direct Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in price_comparisons %}
+                        <tr>
+                            <td><strong>{{ item.crop_name }}</strong></td>
+                            <td>{{ item.mandi_name }}</td>
+                            <td>{{ item.district }}</td>
+                            <td style="color: #64748b;">{{ item.modal_price|currency }} / kg</td>
+                            <td>
+                                {% if item.farmer_min_price %}
+                                    <strong style="color: #059669; font-size: 16px;">{{ item.farmer_min_price|currency }} / kg</strong>
+                                {% else %}
+                                    <span style="color:#94a3b8;">Inquire with farmer</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.farmer_min_price and item.farmer_min_price < item.modal_price %}
+                                    <span class="saving-badge">Save {{ ((item.modal_price - item.farmer_min_price)/item.modal_price * 100)|round|int }}%</span>
+                                {% else %}
+                                    <span class="saving-badge">Direct Farm Fresh</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('crops_catalog', q=item.crop_name) }}" class="btn btn-sm btn-primary">Find Crop &rarr;</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="section">
+    <div class="container">
+        <div style="text-align: center; max-width: 680px; margin: 0 auto 40px;">
+            <h2 class="section-title">How KisanDirect Digital Platform Works</h2>
+            <p class="section-subtitle">Direct, zero-commission workflow designed for simplicity and trust between farmers and consumers.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div style="background:#fff; border:1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; text-align: center;">
+                <div style="font-size: 44px; margin-bottom: 14px;">👩‍🌾</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">1. Farmers Post Harvest</h3>
+                <p style="color: var(--text-muted); font-size: 14px; line-height: 1.6;">Farmers list their available crops, harvest dates, quantity, village location, and expected price in under 2 minutes.</p>
+            </div>
+            <div style="background:#fff; border:1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; text-align: center;">
+                <div style="font-size: 44px; margin-bottom: 14px;">🔍</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">2. Consumers Browse & Compare</h3>
+                <p style="color: var(--text-muted); font-size: 14px; line-height: 1.6;">Consumers find fresh produce near their area, compare prices with government mandi benchmarks, and calculate batch costs.</p>
+            </div>
+            <div style="background:#fff; border:1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; text-align: center;">
+                <div style="font-size: 44px; margin-bottom: 14px;">🤝</div>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">3. Direct Connect & Deal</h3>
+                <p style="color: var(--text-muted); font-size: 14px; line-height: 1.6;">Buyers call or WhatsApp the farmer directly or submit an inquiry to arrange farm pickup or doorstep delivery without commission.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Banner for Farmers and Consumers -->
+<section style="background: linear-gradient(135deg, #064e3b 0%, #047857 100%); color: white; padding: 50px 0; margin-bottom: 0;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
+        <div>
+            <h2 style="color:#fff; font-size: 28px; margin-bottom: 8px;">Are You a Farmer With Harvest Ready?</h2>
+            <p style="color: #d1fae5; font-size: 16px;">List your crops for free and reach thousands of consumers, restaurants, and wholesale buyers directly.</p>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="{{ url_for('register') }}" class="btn btn-lg btn-accent" style="background:#f59e0b;">Register as Farmer</a>
+            <a href="{{ url_for('crops_catalog') }}" class="btn btn-lg btn-secondary">Browse Marketplace</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

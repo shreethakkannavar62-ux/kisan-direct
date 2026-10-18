@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}APMC Mandi Price Benchmarks &amp; Market Intelligence{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <div style="margin-bottom: 24px;">
+        <span style="font-size: 13px; color: var(--text-muted);"><a href="{{ url_for('home') }}">Home</a> &rsaquo; Mandi Benchmarks</span>
+        <h1 style="font-size: 32px; font-weight: 800; color: var(--text-main); margin-top: 8px;">APMC Mandi Price Benchmarks</h1>
+        <p style="color: var(--text-muted); font-size: 15px;">
+            Official benchmark market prices from agricultural produce market committees (APMC) to guide transparent pricing for both farmers and consumers.
+        </p>
+    </div>
+
+    <!-- Search form -->
+    <div style="background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 24px;">
+        <form method="GET" action="{{ url_for('mandi_prices') }}" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" name="q" placeholder="Search by crop name, mandi, or district (e.g. Tomatoes, Nashik, Anand)..." value="{{ search_query or '' }}" style="flex: 1; min-width: 260px;">
+            <button type="submit" class="btn btn-primary">Search Mandi Rates</button>
+            {% if search_query %}
+                <a href="{{ url_for('mandi_prices') }}" class="btn btn-secondary">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Info Banner -->
+    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+            <strong style="color: #166534; font-size: 14.5px;">💡 Why Compare Mandi Prices on KisanDirect?</strong>
+            <p style="font-size: 13px; color: #15803d; margin-top: 2px;">
+                Traditional mandi middlemen charge 15-25% commissions. By comparing rates, farmers price fairly and consumers save directly.
+            </p>
+        </div>
+        <a href="{{ url_for('crops_catalog') }}" class="btn btn-sm btn-primary">Browse Farmer Direct Crops &rarr;</a>
+    </div>
+
+    <!-- Price Table -->
+    <div class="table-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Crop Name</th>
+                        <th>Category</th>
+                        <th>Mandi Name</th>
+                        <th>District / State</th>
+                        <th>Min Rate</th>
+                        <th>Max Rate</th>
+                        <th>Modal (Avg) Rate</th>
+                        <th>Date Reported</th>
+                        <th>Direct Farmers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for price in prices %}
+                    <tr>
+                        <td><strong>{{ price.crop_name }}</strong></td>
+                        <td><span class="crop-category-tag" style="font-size: 11px;">{{ price.category }}</span></td>
+                        <td>{{ price.mandi_name }}</td>
+                        <td>{{ price.district }}</td>
+                        <td style="color: #64748b;">{{ price.min_price|currency }}</td>
+                        <td style="color: #64748b;">{{ price.max_price|currency }}</td>
+                        <td>
+                            <strong style="color: var(--primary-dark); font-size: 16px;">
+                                {{ price.modal_price|currency }} / {{ price.unit }}
+                            </strong>
+                        </td>
+                        <td style="font-size: 12.5px; color: var(--text-muted);">{{ price.date_reported }}</td>
+                        <td>
+                            <a href="{{ url_for('crops_catalog', q=price.crop_name) }}" class="btn btn-sm btn-secondary">
+                                View Direct Crops &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            No mandi price data found matching "{{ search_query }}".
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

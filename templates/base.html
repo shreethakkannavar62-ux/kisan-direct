@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KisanDirect - Direct Digital Platform connecting farmers directly with consumers for fair crop pricing, live availability, and direct contact.">
+    <title>{% block title %}KisanDirect{% endblock %} | Direct Farm-to-Consumer Market</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
+</head>
+<body>
+
+    <!-- Top Announcement Bar -->
+    <div class="navbar-top">
+        <div class="container">
+            <div class="top-notice">
+                <span class="live-dot"></span>
+                <span><strong>Live Direct Marketplace:</strong> Connecting <strong>{{ total_farmers }}</strong> Verified Farmers with Consumers across India</span>
+            </div>
+            <div>
+                <span>Zero Middlemen Commission &bull; Fair Prices Guaranteed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="navbar">
+        <div class="container navbar-inner">
+            <a href="{{ url_for('home') }}" class="brand-link">
+                <span class="brand-icon">🌱</span>
+                <div>
+                    <div class="brand-name">KisanDirect</div>
+                    <span class="brand-tag">Farmer &bull; Consumer Connect</span>
+                </div>
+            </a>
+
+            <button class="mobile-toggle" aria-label="Toggle menu">&#9776;</button>
+
+            <nav class="nav-menu">
+                <a href="{{ url_for('home') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a>
+                <a href="{{ url_for('crops_catalog') }}" class="nav-link {% if request.path == '/crops' %}active{% endif %}">Marketplace ({{ total_active_crops }})</a>
+                <a href="{{ url_for('mandi_prices') }}" class="nav-link {% if request.path == '/mandi-prices' %}active{% endif %}">Mandi Benchmarks</a>
+                <a href="{{ url_for('farmers_directory') }}" class="nav-link {% if request.path == '/farmers' %}active{% endif %}">Farmers Directory</a>
+                <a href="{{ url_for('farming_tips') }}" class="nav-link {% if request.path == '/tips' %}active{% endif %}">Agri Tips</a>
+                
+                {% if session.get('user_id') %}
+                    {% if session.get('role') == 'farmer' %}
+                        <a href="{{ url_for('farmer_dashboard') }}" class="nav-link {% if '/farmer' in request.path %}active{% endif %}">Farmer Portal</a>
+                        <a href="{{ url_for('add_crop') }}" class="btn btn-sm btn-primary">+ List Crop</a>
+                    {% else %}
+                        <a href="{{ url_for('buyer_dashboard') }}" class="nav-link {% if '/buyer' in request.path %}active{% endif %}">My Inquiries</a>
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-secondary">Logout ({{ session.get('full_name').split()[0] }})</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="btn btn-sm btn-secondary">Login</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-sm btn-primary">Join Platform</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Global Flash Alerts -->
+    <div class="container flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:16px;">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Body Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>🌱 KisanDirect</h3>
+                    <p style="margin-bottom: 14px; line-height: 1.6;">A modern open digital platform bridging the gap between Indian farmers and end consumers. Real crop availability, transparent fair pricing, and direct contact via Call and WhatsApp.</p>
+                    <p style="font-size: 13px; color: #64748b;">Direct connection eliminates unnecessary mandi brokerage and ensures farm-fresh produce on consumer tables.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Direct Marketplace</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('crops_catalog') }}">Browse All Crops</a></li>
+                        <li><a href="{{ url_for('crops_catalog', category='Vegetables') }}">Fresh Vegetables</a></li>
+                        <li><a href="{{ url_for('crops_catalog', category='Fruits') }}">Orchard Fruits</a></li>
+                        <li><a href="{{ url_for('crops_catalog', category='Grains & Pulses') }}">Grains & Pulses</a></li>
+                        <li><a href="{{ url_for('crops_catalog', organic='1') }}">100% Organic Certified</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>For Farmers</h4>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('register') }}">Register as Farmer</a></li>
+                        <li><a href="{{ url_for('mandi_prices') }}">APMC Mandi Rates</a></li>
+                        <li><a href="{{ url_for('farming_tips') }}">Harvest & Pricing Tips</a></li>
+                        <li><a href="{{ url_for('login') }}">Farmer Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Direct Transparency</h4>
+                    <p style="margin-bottom: 12px; font-size: 13.5px;">No middlemen fee. No commission cuts on farmers. Real farmers, genuine crop availability, and verified village contacts.</p>
+                    <div style="background-color: #1e293b; padding: 12px; border-radius: var(--radius-md); font-size: 12.5px;">
+                        <span style="color:#34d399; font-weight:700;">Farmer Support Helpline:</span><br>
+                        📞 1800-KISAN-DIRECT (Toll Free Demo)
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 KisanDirect — Digital Farm-to-Consumer Platform. Supporting Indian Farmers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

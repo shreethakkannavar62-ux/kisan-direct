@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Crops Marketplace - Fresh Direct Availability{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <!-- Breadcrumb & Header -->
+    <div style="margin-bottom: 24px;">
+        <span style="font-size: 13px; color: var(--text-muted);"><a href="{{ url_for('home') }}">Home</a> &rsaquo; Crops Marketplace</span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-top: 8px;">
+            <div>
+                <h1 style="font-size: 32px; font-weight: 800; color: var(--text-main);">Direct Crop Marketplace</h1>
+                <p style="color: var(--text-muted); font-size: 15px;">Real-time crop availability directly from farmer fields with transparent rates and contact info.</p>
+            </div>
+            {% if session.get('role') == 'farmer' %}
+                <a href="{{ url_for('add_crop') }}" class="btn btn-primary">+ Add New Crop Listing</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div style="background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+        <form method="GET" action="{{ url_for('crops_catalog') }}">
+            <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr auto; gap: 12px; align-items: center;">
+                
+                <!-- Search input -->
+                <div>
+                    <input type="text" name="q" id="instant-crop-search" placeholder="Search by crop, variety, farmer, or village..." value="{{ search_query or '' }}">
+                </div>
+
+                <!-- Category dropdown -->
+                <div>
+                    <select name="category" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sort dropdown -->
+                <div>
+                    <select name="sort" onchange="this.form.submit()">
+                        <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>Sort: Newly Listed</option>
+                        <option value="price_asc" {% if selected_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_desc" {% if selected_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="qty_desc" {% if selected_sort == 'qty_desc' %}selected{% endif %}>Quantity: Highest Stock</option>
+                    </select>
+                </div>
+
+                <!-- Search Button -->
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    {% if search_query or selected_category or organic_only %}
+                        <a href="{{ url_for('crops_catalog') }}" class="btn btn-secondary">Reset</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick category pills -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; align-items: center;">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-right: 4px;">Quick Filters:</span>
+                <a href="{{ url_for('crops_catalog') }}" class="pill {% if not selected_category and not organic_only %}active{% endif %}">All</a>
+                {% for cat in categories %}
+                    <a href="{{ url_for('crops_catalog', category=cat, q=search_query) }}" class="pill {% if selected_category == cat %}active{% endif %}">
+                        {{ cat }}
+                    </a>
+                {% endfor %}
+                <a href="{{ url_for('crops_catalog', organic='1', category=selected_category, q=search_query) }}" class="pill {% if organic_only == '1' %}active{% endif %}" style="border-color: #10b981; color: #047857;">
+                    🌿 Organic Only
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Count -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <span id="filtered-count" style="font-weight: 700; color: var(--text-muted); font-size: 14px;">
+            Showing {{ crops|length }} available crop listings
+        </span>
+        <span style="font-size: 13px; color: #059669; font-weight: 600;">
+            ✓ All listings verified with farmer phone &amp; WhatsApp
+        </span>
+    </div>
+
+    <!-- Crop Cards Grid -->
+    {% if crops %}
+    <div class="crop-grid">
+        {% for crop in crops %}
+        <div class="crop-card">
+            <div class="crop-card-media">
+                <span>{{ crop.image_emoji }}</span>
+                <div class="crop-badges">
+                    {% if crop.organic %}
+                        <span class="badge badge-organic">🌿 Organic</span>
+                    {% else %}
+                        <span></span>
+                    {% endif %}
+                    <span class="badge badge-available">{{ crop.status }}</span>
+                </div>
+            </div>
+
+            <div class="crop-card-body">
+                <div class="crop-category-tag">{{ crop.category }}</div>
+                <h3 class="crop-name">
+                    <a href="{{ url_for('crop_detail', crop_id=crop.id) }}">{{ crop.crop_name }}</a>
+                </h3>
+                <div class="crop-variety">{{ crop.variety or 'Standard Farm Produce' }}</div>
+
+                <div class="crop-price-box">
+                    <div>
+                        <div class="crop-price-val">{{ crop.price_per_unit|currency }}</div>
+                        <div class="crop-price-unit">per {{ crop.unit }}</div>
+                    </div>
+                    <div class="crop-stock">
+                        <div>Available Stock</div>
+                        <strong>{{ crop.available_qty }} {{ crop.unit }}</strong>
+                    </div>
+                </div>
+
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ crop.description }}
+                </p>
+
+                <!-- Farmer Information -->
+                <div class="crop-farmer-snippet">
+                    <div class="farmer-name-row">
+                        <strong>👨‍🌾 {{ crop.farmer_name }}</strong>
+                        <span style="font-size: 11.5px; color:#059669;">{{ crop.farm_name or 'Independent Farm' }}</span>
+                    </div>
+                    <div class="farmer-loc">
+                        📍 {{ crop.village }}, {{ crop.district }}, {{ crop.state }}
+                    </div>
+                </div>
+
+                <!-- Direct Contact Actions -->
+                <div class="crop-card-actions">
+                    <a href="tel:{{ crop.farmer_phone }}" class="btn btn-sm btn-call" title="Direct Phone Call">
+                        📞 Call {{ crop.farmer_phone }}
+                    </a>
+                    <button onclick="openWhatsApp('{{ crop.farmer_whatsapp or crop.farmer_phone }}', '{{ crop.crop_name }}', '{{ crop.price_per_unit }}', '{{ crop.farmer_name }}')" class="btn btn-sm btn-whatsapp" title="Direct WhatsApp">
+                        💬 WhatsApp
+                    </button>
+                </div>
+
+                <div style="margin-top: 8px;">
+                    <a href="{{ url_for('crop_detail', crop_id=crop.id) }}" class="btn btn-sm btn-secondary btn-full">
+                        View Details & Order Inquiry &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background-color: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 50px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🌾</div>
+        <h3 style="font-size: 20px; margin-bottom: 8px;">No crops found matching your filters</h3>
+        <p style="color: var(--text-muted); margin-bottom: 20px;">Try searching for a different crop name or reset your category filters.</p>
+        <a href="{{ url_for('crops_catalog') }}" class="btn btn-primary">Clear Filters</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

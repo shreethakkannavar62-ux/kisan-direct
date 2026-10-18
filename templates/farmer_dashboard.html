@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Farmer Portal Dashboard - Manage Harvests &amp; Inquiries{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <!-- Dashboard Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <div>
+            <span style="font-size: 13px; color: #059669; font-weight: 700; text-transform: uppercase;">Verified Farmer Portal</span>
+            <h1 style="font-size: 32px; font-weight: 800; color: var(--text-main); margin-top: 4px;">
+                Welcome, {{ session.get('full_name') }}! 🌾
+            </h1>
+            <p style="color: var(--text-muted); font-size: 15px;">
+                Manage your real-time crop availability, set prices, and connect with direct buyers.
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ url_for('add_crop') }}" class="btn btn-primary">+ Add New Crop</a>
+            <a href="{{ url_for('crops_catalog', q=session.get('full_name')) }}" class="btn btn-secondary">Preview Public Listings</a>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="dashboard-stats">
+        <div class="stat-widget">
+            <div>
+                <div class="stat-widget-num">{{ total_listings }}</div>
+                <div class="stat-widget-label">Total Crop Listings</div>
+            </div>
+            <div class="stat-widget-icon">📦</div>
+        </div>
+        <div class="stat-widget">
+            <div>
+                <div class="stat-widget-num">{{ active_stock_items }}</div>
+                <div class="stat-widget-label">Active Stock Batches</div>
+            </div>
+            <div class="stat-widget-icon">✅</div>
+        </div>
+        <div class="stat-widget">
+            <div>
+                <div class="stat-widget-num" style="color: #d97706;">{{ pending_inquiries }}</div>
+                <div class="stat-widget-label">Pending Buyer Inquiries</div>
+            </div>
+            <div class="stat-widget-icon">💬</div>
+        </div>
+    </div>
+
+    <!-- Dashboard Navigation Tabs -->
+    <div class="dashboard-tabs">
+        <button class="tab-btn active" data-target="tab-crops">
+            🌾 My Crop Listings ({{ my_crops|length }})
+        </button>
+        <button class="tab-btn" data-target="tab-inquiries">
+            📩 Consumer Inquiries &amp; Orders ({{ inquiries|length }})
+            {% if pending_inquiries > 0 %}
+                <span class="badge badge-pending" style="margin-left: 6px;">{{ pending_inquiries }} New</span>
+            {% endif %}
+        </button>
+    </div>
+
+    <!-- TAB 1: My Crop Listings -->
+    <div class="tab-pane" id="tab-crops" style="display: block;">
+        
+        {% if my_crops %}
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Crop &amp; Variety</th>
+                            <th>Category</th>
+                            <th>Direct Price</th>
+                            <th>Stock Available</th>
+                            <th>Harvest Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for crop in my_crops %}
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-size: 26px;">{{ crop.image_emoji }}</span>
+                                    <div>
+                                        <strong><a href="{{ url_for('crop_detail', crop_id=crop.id) }}">{{ crop.crop_name }}</a></strong>
+                                        <div style="font-size: 12px; color: var(--text-muted);">{{ crop.variety or 'Standard' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="crop-category-tag">{{ crop.category }}</span></td>
+                            <td>
+                                <strong style="color: var(--primary-dark); font-size: 15px;">
+                                    {{ crop.price_per_unit|currency }} / {{ crop.unit }}
+                                </strong>
+                            </td>
+                            <td>
+                                <strong>{{ crop.available_qty }} {{ crop.unit }}</strong>
+                                <div style="font-size: 11px; color: var(--text-muted);">Min: {{ crop.min_order_qty }} {{ crop.unit }}</div>
+                            </td>
+                            <td style="font-size: 13px; color: var(--text-muted);">{{ crop.harvest_date or 'Recent' }}</td>
+                            <td>
+                                <span class="badge {% if crop.status == 'Available Now' %}badge-available{% elif crop.status == 'Sold Out' %}badge-completed{% else %}badge-harvest{% endif %}">
+                                    {{ crop.status }}
+                                </span>
+                                {% if crop.organic %}
+                                    <span class="badge badge-organic" style="margin-left: 4px;">Organic</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <a href="{{ url_for('edit_crop', crop_id=crop.id) }}" class="btn btn-sm btn-secondary" title="Edit Listing">
+                                        ✏️ Edit
+                                    </a>
+                                    <form method="POST" action="{{ url_for('delete_crop', crop_id=crop.id) }}" onsubmit="return confirm('Are you sure you want to delete this listing?');" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;" title="Delete Listing">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                    <a href="{{ url_for('crop_detail', crop_id=crop.id) }}" class="btn btn-sm btn-secondary" title="View Public Page">
+                                        👁️ View
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div style="background-color: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 50px; text-align: center;">
+            <div style="font-size: 44px; margin-bottom: 12px;">🌱</div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">You haven't listed any crops yet</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Add your first harvest batch so consumers in your area can connect with you directly.</p>
+            <a href="{{ url_for('add_crop') }}" class="btn btn-primary">+ Add Your First Crop Listing</a>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- TAB 2: Consumer Inquiries -->
+    <div class="tab-pane" id="tab-inquiries" style="display: none;">
+        
+        {% if inquiries %}
+        <div class="table-card">
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Crop Requested</th>
+                            <th>Buyer Information</th>
+                            <th>Quantity &amp; Value</th>
+                            <th>Delivery Location</th>
+                            <th>Buyer Note</th>
+                            <th>Status &amp; Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inq in inquiries %}
+                        <tr>
+                            <td>
+                                <strong>{{ inq.crop_name }}</strong>
+                                <div style="font-size: 12px; color: var(--text-muted);">{{ inq.created_at[:10] }}</div>
+                            </td>
+                            <td>
+                                <strong>{{ inq.consumer_name }}</strong>
+                                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                                    <a href="tel:{{ inq.consumer_phone }}" class="btn btn-sm btn-call" style="padding: 3px 8px; font-size: 11px;">
+                                        📞 {{ inq.consumer_phone }}
+                                    </a>
+                                    <button onclick="window.open('https://wa.me/91{{ inq.consumer_phone }}?text=Namaste {{ inq.consumer_name }} ji! Regarding your inquiry for {{ inq.crop_name }} on KisanDirect...', '_blank')" class="btn btn-sm btn-whatsapp" style="padding: 3px 8px; font-size: 11px;">
+                                        💬 WhatsApp
+                                    </button>
+                                </div>
+                                {% if inq.consumer_email %}
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">{{ inq.consumer_email }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong style="font-size: 15px;">{{ inq.requested_qty }} {{ inq.unit }}</strong>
+                                <div style="font-size: 12px; color: #059669; font-weight: 700;">
+                                    Total: {{ (inq.requested_qty * inq.price_per_unit)|currency }}
+                                </div>
+                            </td>
+                            <td style="font-size: 13px;">
+                                {{ inq.delivery_address or 'Pickup at Farm' }}
+                            </td>
+                            <td style="font-size: 12.5px; color: #475569; max-width: 220px;">
+                                {{ inq.message or 'No specific message.' }}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('update_inquiry_status', inquiry_id=inq.id) }}" style="display: flex; gap: 6px; align-items: center;">
+                                    <select name="status" onchange="this.form.submit()" style="font-size: 12px; padding: 4px 8px; border-radius: var(--radius-sm);">
+                                        <option value="Pending" {% if inq.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                        <option value="Confirmed" {% if inq.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                                        <option value="Completed" {% if inq.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                        <option value="Cancelled" {% if inq.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                    </select>
+                                </form>
+                                <div style="margin-top: 4px;">
+                                    <span class="badge {% if inq.status == 'Pending' %}badge-pending{% elif inq.status == 'Confirmed' %}badge-confirmed{% elif inq.status == 'Completed' %}badge-completed{% else %}badge-danger{% endif %}">
+                                        {{ inq.status }}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div style="background-color: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--radius-lg); padding: 50px; text-align: center;">
+            <div style="font-size: 44px; margin-bottom: 12px;">📫</div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">No inquiries received yet</h3>
+            <p style="color: var(--text-muted);">When consumers find your crops on KisanDirect, their purchase inquiries and contact requests will appear right here.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+</div>
+{% endblock %}

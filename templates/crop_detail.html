@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}{{ crop.crop_name }} - Direct Farm Availability{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 20px; font-size: 13.5px; color: var(--text-muted);">
+        <a href="{{ url_for('home') }}">Home</a> &rsaquo; 
+        <a href="{{ url_for('crops_catalog') }}">Crops</a> &rsaquo; 
+        <a href="{{ url_for('crops_catalog', category=crop.category) }}">{{ crop.category }}</a> &rsaquo; 
+        <span>{{ crop.crop_name }}</span>
+    </div>
+
+    {% if request.args.get('inquiry_sent') %}
+    <div style="background-color: #ecfdf5; border: 2px solid #10b981; border-radius: var(--radius-lg); padding: 24px; margin-bottom: 25px; box-shadow: var(--shadow-md);">
+        <div style="display: flex; gap: 16px; align-items: flex-start;">
+            <div style="font-size: 32px;">🎉</div>
+            <div style="flex: 1;">
+                <h3 style="color: #065f46; font-size: 18px; margin-bottom: 6px;">Your Inquiry has been sent to {{ crop.farmer_name }}!</h3>
+                <p style="color: #047857; font-size: 14px; margin-bottom: 14px;">The farmer has received your details. For instant confirmation or quick negotiation, connect directly below:</p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <a href="tel:{{ crop.farmer_phone }}" class="btn btn-call">
+                        📞 Call {{ crop.farmer_name }} ({{ crop.farmer_phone }})
+                    </a>
+                    <button onclick="openWhatsApp('{{ crop.farmer_whatsapp or crop.farmer_phone }}', '{{ crop.crop_name }}', '{{ crop.price_per_unit }}', '{{ crop.farmer_name }}')" class="btn btn-whatsapp">
+                        💬 Open WhatsApp Chat with Farmer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="detail-layout">
+        
+        <!-- Left Main Column: Crop Details & Calculator -->
+        <div class="detail-main">
+            
+            <div class="detail-header-visual">
+                <span>{{ crop.image_emoji }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 12px; flex-wrap: wrap;">
+                <div>
+                    <span class="crop-category-tag">{{ crop.category }}</span>
+                    <h1 style="font-size: 30px; font-weight: 800; color: var(--text-main); margin-top: 4px;">{{ crop.crop_name }}</h1>
+                    <div style="font-size: 15px; color: var(--text-muted);">{{ crop.variety or 'Traditional Variety' }}</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    {% if crop.organic %}
+                        <span class="badge badge-organic" style="font-size: 13px; padding: 6px 12px;">🌿 Certified Organic</span>
+                    {% endif %}
+                    <span class="badge badge-available" style="font-size: 13px; padding: 6px 12px;">{{ crop.status }}</span>
+                </div>
+            </div>
+
+            <!-- Price & Stock Bar -->
+            <div class="crop-price-box" style="padding: 16px 20px; margin: 20px 0;">
+                <div>
+                    <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Direct Farmer Rate</span>
+                    <div class="crop-price-val" style="font-size: 32px;">{{ crop.price_per_unit|currency }} <span style="font-size: 16px; font-weight: 500; color: var(--text-muted);">/ {{ crop.unit }}</span></div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Current Live Availability</span>
+                    <div style="font-size: 20px; font-weight: 800; color: var(--text-main);">{{ crop.available_qty }} {{ crop.unit }}</div>
+                    <span style="font-size: 12px; color: #059669; font-weight: 600;">Minimum order: {{ crop.min_order_qty }} {{ crop.unit }}</span>
+                </div>
+            </div>
+
+            <!-- Hidden field for calculation -->
+            <input type="hidden" id="crop-unit-price" value="{{ crop.price_per_unit }}">
+
+            <!-- Live Price Calculator -->
+            <div class="calculator-box">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: #064e3b; font-size: 15px;">📊 Live Quantity &amp; Price Calculator</strong>
+                    <span style="font-size: 12px; color: #047857;">Instant Estimation</span>
+                </div>
+                <div class="calc-row">
+                    <div style="flex: 1;">
+                        <label for="calc-qty-input" style="font-size: 12px; margin-bottom: 3px;">Desired Quantity ({{ crop.unit }}):</label>
+                        <input type="number" id="calc-qty-input" value="{{ crop.min_order_qty }}" min="{{ crop.min_order_qty }}" max="{{ crop.available_qty }}" step="1" style="background: #fff;">
+                    </div>
+                    <div style="text-align: right; padding-left: 20px;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: #065f46;">Estimated Farm Total</div>
+                        <div class="calc-total" id="calc-total-display">{{ (crop.min_order_qty * crop.price_per_unit)|currency }}</div>
+                    </div>
+                </div>
+                <div style="font-size: 12px; color: #047857; margin-top: 8px;">
+                    * Direct transaction with farmer. No added platform commissions or markups.
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div style="margin: 24px 0;">
+                <h3 style="font-size: 18px; margin-bottom: 10px;">About this Crop &amp; Harvest Quality</h3>
+                <p style="color: #334155; line-height: 1.7; font-size: 15px;">
+                    {{ crop.description or 'Freshly harvested produce cultivated with best agricultural practices. Inspected for quality and optimal shelf life.' }}
+                </p>
+            </div>
+
+            <!-- Crop Specifications Grid -->
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Harvest / Pluck Date</div>
+                    <div class="spec-val">📅 {{ crop.harvest_date or 'Recent Harvest' }}</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Farming Method</div>
+                    <div class="spec-val">
+                        {% if crop.organic %}🌿 Chemical-Free Organic{% else %}🌱 Conventional Natural Farming{% endif %}
+                    </div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Delivery &amp; Logistics</div>
+                    <div class="spec-val">
+                        {% if crop.delivery_available %}🚚 Delivery Available / Discuss{% else %}🚜 Farm Gate Pickup Only{% endif %}
+                    </div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">Pickup Hub Location</div>
+                    <div class="spec-val">📍 {{ crop.pickup_location or crop.village }}</div>
+                </div>
+            </div>
+
+            <!-- Mandi Comparison Card -->
+            {% if mandi_benchmark %}
+            <div style="background-color: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; margin-top: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <strong style="font-size: 14px; color: var(--text-main);">APMC Mandi Market Benchmark</strong>
+                    <span style="font-size: 12px; color: var(--text-muted);">Reported: {{ mandi_benchmark.date_reported }}</span>
+                </div>
+                <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 10px;">
+                    Reference benchmark rate at <strong>{{ mandi_benchmark.mandi_name }} ({{ mandi_benchmark.district }})</strong>:
+                </p>
+                <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted);">Mandi Modal Average:</span>
+                        <div style="font-size: 18px; font-weight: 700; color: #475569;">{{ mandi_benchmark.modal_price|currency }} / kg</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-muted);">KisanDirect Farmer Rate:</span>
+                        <div style="font-size: 18px; font-weight: 800; color: #059669;">{{ crop.price_per_unit|currency }} / {{ crop.unit }}</div>
+                    </div>
+                    {% if crop.price_per_unit < mandi_benchmark.modal_price %}
+                    <div>
+                        <span class="saving-badge" style="font-size: 13px;">
+                            Save {{ ((mandi_benchmark.modal_price - crop.price_per_unit)/mandi_benchmark.modal_price * 100)|round|int }}% Directly
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Right Column: Farmer Contact Card & Direct Inquiry Form -->
+        <div class="detail-sidebar">
+            
+            <!-- Farmer Profile & Direct Contact Box -->
+            <div class="sidebar-card" style="border-top: 4px solid var(--primary);">
+                <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--primary); letter-spacing: 0.5px;">Farmer Contact Details</span>
+                <h3 style="font-size: 20px; margin-top: 4px; margin-bottom: 4px;">👨‍🌾 {{ crop.farmer_name }}</h3>
+                <div style="font-size: 13.5px; color: #059669; font-weight: 600; margin-bottom: 10px;">{{ crop.farm_name or 'Independent Family Farm' }}</div>
+                
+                <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+                    {{ crop.farmer_bio or 'Dedicated local farmer connecting directly with households and commercial buyers.' }}
+                </p>
+
+                <div style="background-color: var(--bg-subtle); border-radius: var(--radius-md); padding: 14px; margin-bottom: 18px; font-size: 13.5px;">
+                    <div style="margin-bottom: 8px;">
+                        <strong>📍 Farm Location:</strong><br>
+                        {{ crop.village }}, District: {{ crop.district }}, {{ crop.state }}
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>📞 Direct Phone:</strong><br>
+                        <a href="tel:{{ crop.farmer_phone }}" style="font-weight: 700; color: #0284c7;">+91 {{ crop.farmer_phone }}</a>
+                    </div>
+                    {% if crop.farmer_whatsapp %}
+                    <div>
+                        <strong>💬 WhatsApp Number:</strong><br>
+                        <span style="font-weight: 700; color: #16a34a;">+91 {{ crop.farmer_whatsapp }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Instant Call & WhatsApp Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="tel:{{ crop.farmer_phone }}" class="btn btn-call btn-lg">
+                        📞 Call Farmer Directly (+91 {{ crop.farmer_phone }})
+                    </a>
+                    <button onclick="openWhatsApp('{{ crop.farmer_whatsapp or crop.farmer_phone }}', '{{ crop.crop_name }}', '{{ crop.price_per_unit }}', '{{ crop.farmer_name }}')" class="btn btn-whatsapp btn-lg">
+                        💬 Chat on WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- Direct Inquiry / Purchase Form -->
+            <div class="sidebar-card">
+                <h3 style="font-size: 18px; margin-bottom: 8px;">Send Purchase Inquiry</h3>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                    Submit your requirement. The farmer will be alerted immediately with your contact details.
+                </p>
+
+                <form method="POST" action="{{ url_for('submit_inquiry', crop_id=crop.id) }}">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="consumer_name">Your Full Name *</label>
+                        <input type="text" id="consumer_name" name="consumer_name" placeholder="e.g. Anand Kumar" value="{{ session.get('full_name', '') }}" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="consumer_phone">Your Mobile / WhatsApp Number *</label>
+                        <input type="tel" id="consumer_phone" name="consumer_phone" placeholder="e.g. 9876543210" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="consumer_email">Your Email (Optional)</label>
+                        <input type="email" id="consumer_email" name="consumer_email" placeholder="e.g. anand@gmail.com" value="{{ session.get('email', '') }}">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="inq-requested-qty">Quantity Needed ({{ crop.unit }}) *</label>
+                        <input type="number" id="inq-requested-qty" name="requested_qty" value="{{ crop.min_order_qty }}" min="{{ crop.min_order_qty }}" max="{{ crop.available_qty }}" step="1" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="delivery_address">Delivery City / Area</label>
+                        <input type="text" id="delivery_address" name="delivery_address" placeholder="e.g. Mumbai / Self Pickup">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label for="message">Note for Farmer</label>
+                        <textarea id="message" name="message" rows="3" placeholder="e.g. When can you deliver? Are you open to weekly recurring supply?"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-lg">
+                        Submit Inquiry to Farmer &rarr;
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Other Crops From Same Farmer -->
+    {% if farmer_other_crops %}
+    <div style="margin-top: 50px;">
+        <h3 style="font-size: 22px; margin-bottom: 20px;">Other Available Crops by {{ crop.farmer_name }}</h3>
+        <div class="crop-grid">
+            {% for other in farmer_other_crops %}
+            <div class="crop-card">
+                <div class="crop-card-media" style="height: 110px; font-size: 48px;">
+                    <span>{{ other.image_emoji }}</span>
+                </div>
+                <div class="crop-card-body">
+                    <h4 style="font-size: 16px; margin-bottom: 4px;">{{ other.crop_name }}</h4>
+                    <div style="color: var(--primary-dark); font-weight: 800; font-size: 18px; margin-bottom: 8px;">
+                        {{ other.price_per_unit|currency }} / {{ other.unit }}
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Stock: {{ other.available_qty }} {{ other.unit }}</div>
+                    <a href="{{ url_for('crop_detail', crop_id=other.id) }}" class="btn btn-sm btn-secondary btn-full">View Crop &rarr;</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

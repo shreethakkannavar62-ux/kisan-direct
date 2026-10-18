@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Farmers Directory - Verified Local Producers{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+
+    <div style="margin-bottom: 30px;">
+        <span style="font-size: 13px; color: var(--text-muted);"><a href="{{ url_for('home') }}">Home</a> &rsaquo; Farmers Directory</span>
+        <h1 style="font-size: 32px; font-weight: 800; color: var(--text-main); margin-top: 8px;">Verified Local Farmers</h1>
+        <p style="color: var(--text-muted); font-size: 15px;">
+            Connect with grassroots agricultural producers directly. Call, WhatsApp, or arrange farm visits and group bulk orders.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;">
+        {% for farmer in farmers %}
+        <div style="background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+            
+            <div style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px;">
+                <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #dcfce7, #a7f3d0); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">
+                    👨‍🌾
+                </div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="font-size: 18px; margin: 0;">{{ farmer.full_name }}</h3>
+                        <span class="badge badge-organic" style="font-size: 10.5px;">Verified</span>
+                    </div>
+                    <div style="font-size: 13.5px; color: #059669; font-weight: 600;">{{ farmer.farm_name or 'Independent Farm Hub' }}</div>
+                    <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;">
+                        📍 {{ farmer.village }}, {{ farmer.district }}, {{ farmer.state }}
+                    </div>
+                </div>
+            </div>
+
+            <p style="font-size: 13.5px; color: #334155; line-height: 1.5; margin-bottom: 16px; flex: 1;">
+                {{ farmer.bio or 'Cultivating quality crops and offering direct farm-gate sales.' }}
+            </p>
+
+            <!-- Listed Crops summary -->
+            <div style="background-color: var(--bg-subtle); padding: 12px; border-radius: var(--radius-md); margin-bottom: 16px; font-size: 12.5px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <strong style="color: var(--text-main);">Current Crops Listed:</strong>
+                    <span style="color: #059669; font-weight: 700;">{{ farmer.crop_count }} batches</span>
+                </div>
+                <div style="color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ farmer.crop_names or 'Fresh seasonal harvest coming soon' }}
+                </div>
+            </div>
+
+            <!-- Direct Contact Actions -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <a href="tel:{{ farmer.phone }}" class="btn btn-sm btn-call">
+                    📞 Call {{ farmer.phone }}
+                </a>
+                <button onclick="openWhatsApp('{{ farmer.whatsapp or farmer.phone }}', 'farm produce', 'market rates', '{{ farmer.full_name }}')" class="btn btn-sm btn-whatsapp">
+                    💬 WhatsApp
+                </button>
+            </div>
+
+            <a href="{{ url_for('crops_catalog', q=farmer.full_name) }}" class="btn btn-sm btn-secondary btn-full">
+                View All Crops by this Farmer &rarr;
+            </a>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

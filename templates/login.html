@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Log In to KisanDirect{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 40px; padding-bottom: 80px;">
+
+    <div class="form-card">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <span style="font-size: 40px;">🌱</span>
+            <h1 style="font-size: 26px; font-weight: 800; margin-top: 8px;">Log In to KisanDirect</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Access your farmer dashboard or consumer inquiries</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" placeholder="e.g. ramesh@kisan.in" required>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <label for="password" style="margin-bottom: 0;">Password *</label>
+                </div>
+                <input type="password" id="password" name="password" placeholder="Enter your account password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top: 8px;">
+                Log In &rarr;
+            </button>
+        </form>
+
+        <!-- Quick Demo Credentials Box -->
+        <div style="background-color: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; margin-top: 24px; font-size: 12.5px;">
+            <strong style="color: var(--text-main);">Demo Logins for Testing:</strong>
+            <div style="margin-top: 6px; line-height: 1.6;">
+                👨‍🌾 <strong>Farmer Account:</strong> <code>ramesh@kisan.in</code> / <code>farmer123</code><br>
+                🛒 <strong>Consumer Account:</strong> <code>priya@consumer.com</code> / <code>buyer123</code>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px; font-size: 14px; color: var(--text-muted);">
+            Don't have an account yet? 
+            <a href="{{ url_for('register') }}" style="font-weight: 700;">Register as Farmer or Consumer</a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
