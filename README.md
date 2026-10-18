@@ -36,6 +36,14 @@
 7. **Agricultural & Post-Harvest Advisories**
    - Field tips on direct marketing, organic pest protection, post-harvest packaging, and storage.
 
+8. **🌦️ Real-Time Agricultural Weather & Location Advisory**
+   - Live weather data powered by Open-Meteo API (no API key required).
+   - Hyper-local forecast for 16+ Indian agricultural hubs (Belagavi, Nashik, Anand, Ludhiana, Pune, Jaipur, Shimla, and more).
+   - Intelligent **Spraying Window**, **Irrigation**, **Harvesting**, and **Disease & Pest** advisories generated from real meteorological data.
+   - 7-day agricultural forecast with farming suitability tags (Ideal Harvest, Rain Alert, High Heat, Good Sowing).
+   - GPS-based farm location detection and Open-Meteo Geocoding for any custom location search.
+   - Graceful offline fallback with realistic seasonal data.
+
 ---
 
 ## 🛠️ Technology Stack
@@ -44,6 +52,7 @@
 - **Database**: SQLite3 (Embedded relational storage with foreign keys)
 - **Frontend**: Semantic HTML5, Vanilla JavaScript (Dynamic price calculator, tabs, instant search, WhatsApp links)
 - **Styling**: Vanilla CSS Design System with custom typography (`Plus Jakarta Sans` & `Outfit`), mobile-first responsive layout, and custom badges.
+- **Weather API**: [Open-Meteo](https://open-meteo.com/) — Free, no API key needed. Real-time current weather, 7-day forecast, and geocoding.
 
 ---
 
@@ -53,6 +62,7 @@
 farmer v 1.2/
 ├── app.py                      # Main Flask application and routing
 ├── database.py                 # SQLite database schema, helpers, and sample seed data
+├── weather_service.py          # Real-time weather API integration (Open-Meteo) with agricultural advisories
 ├── requirements.txt            # Python dependencies
 ├── farmer_market.db            # SQLite database file (created on init)
 ├── static/
@@ -72,6 +82,7 @@ farmer v 1.2/
 │   ├── mandi_prices.html       # APMC Mandi benchmark comparison table
 │   ├── farmers_directory.html  # Directory of verified local farmers
 │   ├── tips.html               # Agronomy and harvesting tips
+│   ├── weather.html            # 🌦️ Agricultural Weather & Location Advisory page
 │   ├── login.html              # Authentication login page
 │   └── register.html           # Dual-role registration (Farmer / Consumer)
 └── README.md

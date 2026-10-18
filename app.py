@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from database import get_db, init_db
+from weather_service import get_live_weather, resolve_location, AGRICULTURAL_DISTRICTS
 from datetime import datetime
 
 app = Flask(__name__)
@@ -328,6 +329,67 @@ def farming_tips():
     tips = c.fetchall()
     conn.close()
     return render_template('tips.html', tips=tips)
+
+# -------------------------------------------------------------
+# Agricultural Weather & Location Advisory
+# -------------------------------------------------------------
+@app.route('/weather')
+def weather_view():
+    district = request.args.get('district', 'Belagavi').strip()
+    lat_param = request.args.get('lat', '').strip()
+    lon_param = request.args.get('lon', '').strip()
+
+    # Resolve location from district name or GPS coordinates
+    if lat_param and lon_param:
+        try:
+            lat = float(lat_param)
+            lon = float(lon_param)
+            location_name = district or 'My Farm Location'
+            state = 'India'
+        except ValueError:
+            loc = resolve_location(district)
+            lat, lon = loc['lat'], loc['lon']
+            location_name, state = loc['name'], loc['state']
+    else:
+        loc = resolve_location(district)
+        lat, lon = loc['lat'], loc['lon']
+        location_name, state = loc['name'], loc['state']
+
+    weather = get_live_weather(lat, lon, location_name, state)
+
+    # Query crops and mandi data near this location
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute('''
+        SELECT c.*, u.full_name as farmer_name, u.phone as farmer_phone,
+               u.whatsapp as farmer_whatsapp, u.village, u.district, u.state
+        FROM crops c
+        JOIN users u ON c.farmer_id = u.id
+        WHERE c.available_qty > 0
+          AND (u.district LIKE ? OR u.state LIKE ? OR u.village LIKE ?)
+        ORDER BY c.created_at DESC
+        LIMIT 5
+    ''', (f"%{location_name}%", f"%{state}%", f"%{location_name}%"))
+    local_crops = c.fetchall()
+
+    c.execute('''
+        SELECT * FROM mandi_prices
+        WHERE district LIKE ? OR mandi_name LIKE ?
+        ORDER BY crop_name ASC
+        LIMIT 5
+    ''', (f"%{location_name}%", f"%{location_name}%"))
+    local_mandi = c.fetchall()
+
+    conn.close()
+
+    return render_template(
+        'weather.html',
+        weather=weather,
+        local_crops=local_crops,
+        local_mandi=local_mandi,
+        hubs=AGRICULTURAL_DISTRICTS
+    )
 
 # -------------------------------------------------------------
 # Authentication (Register, Login, Logout)

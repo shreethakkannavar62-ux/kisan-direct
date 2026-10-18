@@ -143,6 +143,7 @@
                 <li><button class="nav-btn" onclick="showTab('mandi')">Mandi Rates</button></li>
                 <li><button class="nav-btn" onclick="showTab('farmers')">Verified Farmers</button></li>
                 <li><button class="nav-btn" onclick="showTab('tips')">Agri Guides</button></li>
+                <li><button class="nav-btn" onclick="showTab('weather')">🌦️ Weather</button></li>
                 <li><button class="nav-btn" onclick="showTab('portal')" style="background:var(--primary);color:#fff;">+ Farmer Portal</button></li>
             </ul>
         </div>
@@ -261,6 +262,87 @@
         <div class="crop-grid" id="tipsGrid">
             <!-- Populated by JS -->
         </div>
+    </div>
+
+    <!-- SECTION: Weather Advisory -->
+    <div id="tab-weather" class="container section" style="display:none;">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">🌦️ Agricultural Weather &amp; Location Advisory</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Hyper-local farm microclimate forecast, spray window, and irrigation advisory.</p>
+            </div>
+        </div>
+
+        <!-- Location Search -->
+        <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px 22px; margin-bottom:24px; box-shadow:var(--shadow-sm);">
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                <div style="flex:1; min-width:260px; position:relative;">
+                    <input type="text" id="weatherLocationInput" placeholder="Enter farm village, town, or district (e.g. Belagavi, Nashik, Ludhiana)..." value="Belagavi" style="padding-left:38px;">
+                    <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px;">🔍</span>
+                </div>
+                <button class="btn btn-primary" onclick="fetchWeather()">Check Weather</button>
+                <button class="btn btn-secondary" onclick="detectGPS()">📍 Detect My Location</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:14px; padding-top:12px; border-top:1px dashed var(--border);">
+                <span style="font-size:12.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Agricultural Hubs:</span>
+                <button class="pill active" onclick="setWeatherLocation('Belagavi', this)" style="padding:4px 10px; font-size:12px;">Belagavi</button>
+                <button class="pill" onclick="setWeatherLocation('Nashik', this)" style="padding:4px 10px; font-size:12px;">Nashik</button>
+                <button class="pill" onclick="setWeatherLocation('Anand', this)" style="padding:4px 10px; font-size:12px;">Anand</button>
+                <button class="pill" onclick="setWeatherLocation('Ludhiana', this)" style="padding:4px 10px; font-size:12px;">Ludhiana</button>
+                <button class="pill" onclick="setWeatherLocation('Pune', this)" style="padding:4px 10px; font-size:12px;">Pune</button>
+                <button class="pill" onclick="setWeatherLocation('Jaipur', this)" style="padding:4px 10px; font-size:12px;">Jaipur</button>
+                <button class="pill" onclick="setWeatherLocation('Shimla', this)" style="padding:4px 10px; font-size:12px;">Shimla</button>
+            </div>
+        </div>
+
+        <!-- Weather Display Card -->
+        <div id="weatherDisplay" style="background:linear-gradient(135deg,#064e3b 0%,#065f46 50%,#047857 100%); color:#fff; border-radius:var(--radius-lg); padding:32px; margin-bottom:24px; box-shadow:var(--shadow-md); position:relative; overflow:hidden;">
+            <div style="position:absolute; right:30px; bottom:-15px; font-size:160px; opacity:0.12; pointer-events:none;" id="wBigIcon">☀️</div>
+            <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:24px; position:relative; z-index:1;">
+                <div>
+                    <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.15); padding:4px 14px; border-radius:99px; font-size:13.5px; margin-bottom:12px;">
+                        <span>📍</span>
+                        <strong id="wLocName">Belagavi, Karnataka</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:20px; margin-top:6px;">
+                        <div style="font-size:64px; line-height:1;" id="wIcon">☀️</div>
+                        <div>
+                            <div style="font-size:56px; font-weight:800; line-height:1; letter-spacing:-1px;" id="wTemp">--°C</div>
+                            <div style="font-size:18px; color:#a7f3d0; font-weight:600; margin-top:4px;" id="wCondition">Loading...</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px; font-size:14.5px; color:#d1fae5; line-height:1.5;" id="wTip">
+                        🌾 <strong>Agronomy Note:</strong> Checking weather data...
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; align-content:center;">
+                    <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:var(--radius-md); padding:12px 16px;">
+                        <span style="font-size:12px; color:#a7f3d0; text-transform:uppercase; font-weight:600;">💧 Humidity</span>
+                        <div style="font-size:22px; font-weight:800; margin-top:2px;" id="wHumidity">--%</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:var(--radius-md); padding:12px 16px;">
+                        <span style="font-size:12px; color:#a7f3d0; text-transform:uppercase; font-weight:600;">💨 Wind</span>
+                        <div style="font-size:22px; font-weight:800; margin-top:2px;" id="wWind">-- km/h</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:var(--radius-md); padding:12px 16px;">
+                        <span style="font-size:12px; color:#a7f3d0; text-transform:uppercase; font-weight:600;">🌧️ Precipitation</span>
+                        <div style="font-size:22px; font-weight:800; margin-top:2px;" id="wPrecip">-- mm</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:var(--radius-md); padding:12px 16px;">
+                        <span style="font-size:12px; color:#a7f3d0; text-transform:uppercase; font-weight:600;">⏲️ Pressure</span>
+                        <div style="font-size:22px; font-weight:800; margin-top:2px;" id="wPressure">-- hPa</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advisory Cards -->
+        <h3 style="font-size:20px; font-weight:800; margin-bottom:14px;">🌱 Farm Advisories</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-bottom:28px;" id="advisoryGrid"></div>
+
+        <!-- 7-Day Forecast -->
+        <h3 style="font-size:20px; font-weight:800; margin-bottom:14px;">📅 7-Day Agricultural Forecast</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:14px;" id="forecastGrid"></div>
     </div>
 
     <!-- SECTION: Farmer Portal -->
@@ -538,7 +620,7 @@
 
         // Tab Navigation
         function showTab(name) {
-            ['marketplace', 'mandi', 'farmers', 'tips', 'portal'].forEach(t => {
+            ['marketplace', 'mandi', 'farmers', 'tips', 'weather', 'portal'].forEach(t => {
                 document.getElementById(`tab-${t}`).style.display = t === name ? 'block' : 'none';
             });
             document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -546,6 +628,174 @@
             });
             window.scrollTo({ top: 400, behavior: 'smooth' });
             renderCrops();
+            if (name === 'weather' && !weatherLoaded) { fetchWeather(); }
+        }
+
+        // ========== Weather System ==========
+        const WMO_CODES = {
+            0: ['Clear Sky','☀️','Optimal sunshine for photosynthesis and solar crop drying.'],
+            1: ['Mainly Clear','🌤️','Bright conditions with sparse clouds; good for field work.'],
+            2: ['Partly Cloudy','⛅','Mild sunshine; great for harvesting.'],
+            3: ['Overcast','☁️','Dense cloud cover; reduced evaporation.'],
+            45: ['Foggy','🌫️','Dense fog; monitor for fungal moisture.'],
+            48: ['Rime Fog','🌫️','Chilly fog; delay spraying.'],
+            51: ['Light Drizzle','🌦️','Minor drizzle; minimal impact.'],
+            53: ['Moderate Drizzle','🌦️','Moderate drizzle; delay spraying.'],
+            55: ['Dense Drizzle','🌧️','Persistent drizzle; halt spraying.'],
+            61: ['Slight Rain','🌦️','Light showers; natural hydration.'],
+            63: ['Moderate Rain','🌧️','Steady rain; halt irrigation.'],
+            65: ['Heavy Rain','🌧️','Significant rainfall; clear drainage.'],
+            80: ['Light Showers','🌦️','Passing showers.'],
+            81: ['Moderate Showers','🌧️','Moderate shower bursts.'],
+            82: ['Violent Showers','⛈️','Intense downpour alert.'],
+            95: ['Thunderstorm','⛈️','Thunder & lightning; keep machinery indoors.'],
+            96: ['Hail Storm','⛈️','Hailstorm warning; protect crops.'],
+            99: ['Heavy Hail','⛈️','Severe hailstorm risk.']
+        };
+
+        const AG_HUBS = {
+            'Belagavi': { lat: 15.8497, lon: 74.4977, state: 'Karnataka' },
+            'Nashik': { lat: 19.9975, lon: 73.7898, state: 'Maharashtra' },
+            'Anand': { lat: 22.5645, lon: 72.9289, state: 'Gujarat' },
+            'Ludhiana': { lat: 30.9010, lon: 75.8573, state: 'Punjab' },
+            'Pune': { lat: 18.5204, lon: 73.8567, state: 'Maharashtra' },
+            'Jaipur': { lat: 26.9124, lon: 75.7873, state: 'Rajasthan' },
+            'Shimla': { lat: 31.1048, lon: 77.1734, state: 'Himachal Pradesh' }
+        };
+
+        let weatherLoaded = false;
+
+        function setWeatherLocation(name, el) {
+            document.getElementById('weatherLocationInput').value = name;
+            document.querySelectorAll('#tab-weather .pill').forEach(p => p.classList.remove('active'));
+            if (el) el.classList.add('active');
+            fetchWeather();
+        }
+
+        function detectGPS() {
+            if (!navigator.geolocation) { alert('Geolocation not supported.'); return; }
+            navigator.geolocation.getCurrentPosition(pos => {
+                fetchWeatherByCoords(pos.coords.latitude, pos.coords.longitude, 'My Farm Location');
+            }, () => alert('Could not detect location. Please type your district.'), { timeout: 8000 });
+        }
+
+        async function resolveLocationCoords(name) {
+            if (AG_HUBS[name]) return { lat: AG_HUBS[name].lat, lon: AG_HUBS[name].lon, state: AG_HUBS[name].state, locName: name };
+            try {
+                const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=en&format=json`);
+                const d = await r.json();
+                if (d.results && d.results.length > 0) {
+                    return { lat: d.results[0].latitude, lon: d.results[0].longitude, state: d.results[0].admin1 || 'India', locName: d.results[0].name };
+                }
+            } catch(e) {}
+            return { lat: 15.8497, lon: 74.4977, state: 'Karnataka', locName: 'Belagavi' };
+        }
+
+        async function fetchWeather() {
+            const name = document.getElementById('weatherLocationInput').value.trim() || 'Belagavi';
+            const loc = await resolveLocationCoords(name);
+            fetchWeatherByCoords(loc.lat, loc.lon, loc.locName + ', ' + loc.state);
+        }
+
+        async function fetchWeatherByCoords(lat, lon, locLabel) {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum&timezone=auto`;
+                const resp = await fetch(url);
+                const data = await resp.json();
+                const cur = data.current || {};
+                const daily = data.daily || {};
+                const code = cur.weather_code || 0;
+                const [cond, icon, tip] = WMO_CODES[code] || ['Clear','☀️','Good weather.'];
+
+                document.getElementById('wLocName').textContent = locLabel;
+                document.getElementById('wTemp').textContent = `${Math.round(cur.temperature_2m || 0)}°C`;
+                document.getElementById('wCondition').textContent = `${cond} • Feels like ${Math.round(cur.apparent_temperature || 0)}°C`;
+                document.getElementById('wIcon').textContent = icon;
+                document.getElementById('wBigIcon').textContent = icon;
+                document.getElementById('wTip').innerHTML = `🌾 <strong>Agronomy Note:</strong> ${tip}`;
+                document.getElementById('wHumidity').textContent = `${cur.relative_humidity_2m || '--'}%`;
+                document.getElementById('wWind').textContent = `${cur.wind_speed_10m || '--'} km/h`;
+                document.getElementById('wPrecip').textContent = `${cur.precipitation || 0} mm`;
+                document.getElementById('wPressure').textContent = `${Math.round(cur.surface_pressure || 0)} hPa`;
+
+                renderAdvisories(cur, daily);
+                renderForecast(daily);
+                weatherLoaded = true;
+            } catch(e) {
+                document.getElementById('wCondition').textContent = 'Could not fetch weather data. Please try again.';
+            }
+        }
+
+        function renderAdvisories(cur, daily) {
+            const wind = cur.wind_speed_10m || 0;
+            const humidity = cur.relative_humidity_2m || 50;
+            const temp = cur.temperature_2m || 28;
+            const rainProb = (daily.precipitation_probability_max || [10])[0];
+            const advisories = [];
+
+            // Spray
+            if (wind > 15) advisories.push({ icon:'🚿', title:'Spraying Window', badge:'⚠️ Postpone', cls:'warning', text:`Wind ${wind} km/h exceeds safe limit. High pesticide drift risk.` });
+            else if (rainProb > 45) advisories.push({ icon:'🚿', title:'Spraying Window', badge:'🛑 Rain Risk', cls:'danger', text:`${rainProb}% rain chance. Chemical wash-off before absorption.` });
+            else advisories.push({ icon:'🚿', title:'Spraying Window', badge:'✅ Safe', cls:'safe', text:`Gentle wind (${wind} km/h) and low rain risk. Best time: 06:30-09:30 AM.` });
+
+            // Irrigation
+            if (rainProb > 65) advisories.push({ icon:'💧', title:'Smart Irrigation', badge:'🌧️ Skip', cls:'info', text:`Rain expected (${rainProb}%). Conserve water; hold off drip irrigation.` });
+            else if (temp >= 33) advisories.push({ icon:'💧', title:'Smart Irrigation', badge:'☀️ High Evap.', cls:'warning', text:`High of ${temp}°C. Irrigate root zones in early AM or evening.` });
+            else advisories.push({ icon:'💧', title:'Smart Irrigation', badge:'💧 Normal', cls:'safe', text:`Moderate temps (${temp}°C). Proceed with standard irrigation.` });
+
+            // Harvest
+            if (rainProb > 40) advisories.push({ icon:'🌾', title:'Harvesting', badge:'⚠️ Cover Yards', cls:'warning', text:'Showers possible. Keep tarpaulins over threshing and drying yards.' });
+            else advisories.push({ icon:'🌾', title:'Harvesting', badge:'🌾 Ideal', cls:'safe', text:`Clear outlook (${rainProb}% rain). Suitable for cutting, drying, loading.` });
+
+            // Disease
+            if (humidity > 75 && temp >= 22 && temp <= 31) advisories.push({ icon:'🐛', title:'Disease Alert', badge:'🍄 Fungal Risk', cls:'danger', text:`Warm ${temp}°C + ${humidity}% humidity accelerates mildew & blight.` });
+            else advisories.push({ icon:'🐛', title:'Disease Alert', badge:'🌱 Low Risk', cls:'safe', text:'Balanced microclimate. Maintain routine organic preventative care.' });
+
+            const grid = document.getElementById('advisoryGrid');
+            grid.innerHTML = advisories.map(a => `
+                <div style="background:#fff; border:1px solid var(--border); border-top:4px solid ${a.cls==='safe'?'#10b981':a.cls==='warning'?'#f59e0b':a.cls==='danger'?'#ef4444':'#6366f1'}; border-radius:var(--radius-md); padding:18px; box-shadow:var(--shadow-sm);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">${a.icon} ${a.title}</span>
+                        <span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; background:${a.cls==='safe'?'#ecfdf5':a.cls==='warning'?'#fffbeb':a.cls==='danger'?'#fef2f2':'#eff6ff'}; color:${a.cls==='safe'?'#047857':a.cls==='warning'?'#b45309':a.cls==='danger'?'#b91c1c':'#1d4ed8'};">${a.badge}</span>
+                    </div>
+                    <p style="font-size:13.5px; color:#475569; line-height:1.5;">${a.text}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderForecast(daily) {
+            const dates = daily.time || [];
+            const codes = daily.weather_code || [];
+            const maxT = daily.temperature_2m_max || [];
+            const minT = daily.temperature_2m_min || [];
+            const rainP = daily.precipitation_probability_max || [];
+            const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            const grid = document.getElementById('forecastGrid');
+
+            grid.innerHTML = dates.slice(0, 7).map((d, i) => {
+                const dt = new Date(d);
+                const dayName = i === 0 ? 'Today' : days[dt.getDay()];
+                const fullDate = dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short' });
+                const [cond, icon] = WMO_CODES[codes[i]] || ['Clear','☀️',''];
+                const rp = rainP[i] || 0;
+                let tag, tagCls;
+                if (rp > 50) { tag = '🌧️ Rain Alert'; tagCls = '#fef2f2; color:#991b1b; border:1px solid #fecaca'; }
+                else if (maxT[i] >= 34) { tag = '☀️ High Heat'; tagCls = '#fffbeb; color:#92400e; border:1px solid #fde68a'; }
+                else if (rp < 20) { tag = '🌾 Ideal Harvest'; tagCls = '#ecfdf5; color:#065f46; border:1px solid #a7f3d0'; }
+                else { tag = '🌱 Good Sowing'; tagCls = '#f0f9ff; color:#075985; border:1px solid #bae6fd'; }
+
+                return `
+                    <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-md); padding:16px 12px; text-align:center; box-shadow:var(--shadow-sm); transition:0.2s;">
+                        <div style="font-weight:800; font-size:15px;">${dayName}</div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">${fullDate}</div>
+                        <div style="font-size:38px; line-height:1.1; margin:6px 0;">${icon}</div>
+                        <div style="font-size:12.5px; font-weight:600; color:#334155; margin-bottom:8px; min-height:32px; display:flex; align-items:center; justify-content:center;">${cond}</div>
+                        <div style="font-size:16px; font-weight:800; color:var(--primary-dark);">${Math.round(maxT[i])}° <span style="font-size:13px; font-weight:500; color:#64748b;">/ ${Math.round(minT[i])}°</span></div>
+                        <div style="margin-top:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:99px; padding:3px 8px; font-size:11.5px; color:#166534; font-weight:600;">🌧️ ${rp}% Rain</div>
+                        <div style="margin-top:8px;"><span style="display:inline-block; font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; background:${tagCls};">${tag}</span></div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Populate Mandi Table
