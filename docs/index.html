@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KisanDirect - Digital Platform connecting farmers directly with consumers by providing real crop availability, transparent prices, and direct contact.">
+    <title>KisanDirect | Digital Farm-to-Consumer Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-hover: #047857;
+            --primary-dark: #064e3b;
+            --primary-light: #ecfdf5;
+            --primary-border: #a7f3d0;
+            --accent: #d97706;
+            --accent-light: #fef3c7;
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 6px 16px rgba(0,0,0,0.08);
+            --shadow-hover: 0 14px 25px -4px rgba(16, 185, 129, 0.18);
+            --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: var(--font-body); background-color: var(--bg-page); color: var(--text-main); line-height: 1.6; }
+        h1,h2,h3,h4 { font-family: var(--font-heading); font-weight: 700; }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Announcement */
+        .topbar { background: var(--primary-dark); color: #a7f3d0; font-size: 13px; padding: 7px 0; text-align: center; }
+        .live-dot { width: 8px; height: 8px; background: #34d399; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+        /* Navbar */
+        .navbar { background: #fff; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+        .navbar-inner { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        .brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; color: var(--primary-dark); font-family: var(--font-heading); }
+        .nav-links { display: flex; gap: 8px; align-items: center; list-style: none; }
+        .nav-btn { padding: 8px 14px; font-size: 14.5px; font-weight: 600; color: var(--text-muted); border-radius: var(--radius-md); border: none; background: none; cursor: pointer; transition: 0.2s; }
+        .nav-btn:hover, .nav-btn.active { color: var(--primary); background: var(--primary-light); }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 16px; font-size: 13.5px; font-weight: 600; border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-secondary { background: #fff; color: var(--text-main); border-color: var(--border); }
+        .btn-secondary:hover { background: var(--bg-subtle); }
+        .btn-call { background: #0284c7; color: #fff !important; }
+        .btn-whatsapp { background: #25D366; color: #fff !important; }
+        .btn-whatsapp:hover { background: #20ba59; }
+        .btn-sm { padding: 6px 12px; font-size: 12.5px; }
+        .btn-full { width: 100%; }
+
+        /* Hero */
+        .hero { background: linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%); color: #fff; padding: 55px 0 65px; text-align: center; }
+        .hero-title { font-size: 42px; margin-bottom: 14px; letter-spacing: -0.5px; }
+        .hero-title span { color: #fde047; }
+        .hero-sub { font-size: 18px; color: #d1fae5; max-width: 720px; margin: 0 auto 30px; font-weight: 400; }
+        .search-box { background: #fff; border-radius: var(--radius-lg); padding: 8px 12px; max-width: 650px; margin: 0 auto; display: flex; gap: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        .search-box input { flex: 1; border: none; outline: none; font-size: 15px; padding: 8px; font-family: inherit; }
+
+        /* Stats */
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 860px; margin: 35px auto 0; }
+        .stat-card { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-md); padding: 14px; }
+        .stat-num { font-size: 26px; font-weight: 800; color: #fef08a; }
+        .stat-label { font-size: 12px; color: #d1fae5; text-transform: uppercase; }
+
+        /* Sections */
+        .section { padding: 45px 0; }
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .section-title { font-size: 26px; }
+
+        /* Filter Pills */
+        .pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px; }
+        .pill { padding: 7px 16px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-full); font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); }
+        .pill.active, .pill:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* Crop Grid */
+        .crop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 24px; }
+        .crop-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: 0.2s; display: flex; flex-direction: column; }
+        .crop-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--primary-border); }
+        .crop-img { height: 130px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); display: flex; align-items: center; justify-content: center; font-size: 60px; position: relative; }
+        .crop-badge { position: absolute; top: 10px; right: 10px; background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .organic-tag { position: absolute; top: 10px; left: 10px; background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 700; }
+        .crop-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+        .crop-cat { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; }
+        .crop-name { font-size: 18px; margin-bottom: 4px; }
+        .crop-price-box { background: var(--bg-subtle); border-radius: var(--radius-md); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+        .crop-price { font-size: 22px; font-weight: 800; color: var(--primary-dark); }
+        .farmer-row { border-top: 1px dashed var(--border); padding-top: 12px; margin-top: auto; font-size: 12.5px; }
+        .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+
+        /* Table */
+        .table-box { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+        th { background: #f8fafc; padding: 14px 18px; font-size: 12px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        td { padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; border-radius: var(--radius-lg); max-width: 520px; width: 100%; padding: 28px; box-shadow: var(--shadow-md); position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-btn { position: absolute; top: 18px; right: 20px; font-size: 24px; border: none; background: none; cursor: pointer; color: var(--text-muted); }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: inherit; font-size: 14px; outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+        /* Footer */
+        .footer { background: #0f172a; color: #94a3b8; padding: 45px 0 25px; margin-top: 60px; font-size: 14px; }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 30px; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="container">
+            <span class="live-dot"></span>
+            <strong>KisanDirect Live Platform:</strong> Connecting Verified Farmers Directly with Consumers &bull; Zero Middlemen Cuts
+        </div>
+    </div>
+
+    <header class="navbar">
+        <div class="container navbar-inner">
+            <a href="#" class="brand">🌱 KisanDirect</a>
+            <ul class="nav-links">
+                <li><button class="nav-btn active" onclick="showTab('marketplace')">Marketplace</button></li>
+                <li><button class="nav-btn" onclick="showTab('mandi')">Mandi Rates</button></li>
+                <li><button class="nav-btn" onclick="showTab('farmers')">Verified Farmers</button></li>
+                <li><button class="nav-btn" onclick="showTab('tips')">Agri Guides</button></li>
+                <li><button class="nav-btn" onclick="showTab('portal')" style="background:var(--primary);color:#fff;">+ Farmer Portal</button></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Buy Fresh Crops Direct From <span>Local Farmers</span></h1>
+            <p class="hero-sub">Direct farm availability, transparent pricing, live APMC comparisons, and 1-click WhatsApp &amp; Call connection.</p>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search crops (e.g. Tomatoes, Grapes, Onions, Wheat)..." oninput="filterCrops()">
+                <button class="btn btn-primary" onclick="filterCrops()">Search</button>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-num" id="cropCountDisplay">12+</div>
+                    <div class="stat-label">Active Crop Batches</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num">3</div>
+                    <div class="stat-label">Verified Regional Hubs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num">25-35%</div>
+                    <div class="stat-label">Consumer Savings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num">0%</div>
+                    <div class="stat-label">Middleman Margin</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: Marketplace -->
+    <div id="tab-marketplace" class="container section">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Fresh Harvest Available Right Now</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Direct harvest from fields with live availability in kg &amp; quintals.</p>
+            </div>
+            <div style="font-size:13.5px; font-weight:700; color:var(--primary);">
+                ✓ Direct Farmer Calling &amp; WhatsApp Enabled
+            </div>
+        </div>
+
+        <!-- Pills -->
+        <div class="pills">
+            <button class="pill active" onclick="setCategory('All', this)">All Produce</button>
+            <button class="pill" onclick="setCategory('Vegetables', this)">🥦 Vegetables</button>
+            <button class="pill" onclick="setCategory('Fruits', this)">🍎 Fruits</button>
+            <button class="pill" onclick="setCategory('Grains & Pulses', this)">🌾 Grains &amp; Pulses</button>
+            <button class="pill" onclick="setCategory('Spices & Herbs', this)">🌶️ Spices</button>
+            <button class="pill" onclick="setCategory('Organic', this)">🌿 Organic Certified</button>
+        </div>
+
+        <div class="crop-grid" id="cropGrid">
+            <!-- Dynamic crop cards populated by JS -->
+        </div>
+    </div>
+
+    <!-- SECTION: Mandi Benchmark Rates -->
+    <div id="tab-mandi" class="container section" style="display:none;">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">APMC Mandi Market Benchmarks</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Official agricultural market rates vs. direct farm-gate pricing.</p>
+            </div>
+        </div>
+
+        <div class="table-box">
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Crop</th>
+                            <th>Mandi Name</th>
+                            <th>District</th>
+                            <th>Mandi Modal Rate</th>
+                            <th>KisanDirect Farmer Rate</th>
+                            <th>Direct Advantage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mandiTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION: Farmers Directory -->
+    <div id="tab-farmers" class="container section" style="display:none;">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Verified Regional Farmers</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Connect directly with local farm growers.</p>
+            </div>
+        </div>
+        <div class="crop-grid" id="farmersGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- SECTION: Agri Tips -->
+    <div id="tab-tips" class="container section" style="display:none;">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Agri Advisories &amp; Best Practices</h2>
+                <p style="color:var(--text-muted); font-size:14px;">Field advisories on harvest grading, packaging, and natural farming.</p>
+            </div>
+        </div>
+        <div class="crop-grid" id="tipsGrid">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <!-- SECTION: Farmer Portal -->
+    <div id="tab-portal" class="container section" style="display:none;">
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Farmer Self-Listing Portal</h2>
+                <p style="color:var(--text-muted); font-size:14px;">List your ready harvest batch in 60 seconds.</p>
+            </div>
+        </div>
+
+        <div style="background:#fff; border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px; max-width:680px; margin:0 auto; box-shadow:var(--shadow-sm);">
+            <form id="newCropForm" onsubmit="handleNewCrop(event)">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label>Crop Name *</label>
+                        <input type="text" id="fc_name" placeholder="e.g. Organic Tomatoes" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="fc_cat" required>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Grains & Pulses">Grains &amp; Pulses</option>
+                            <option value="Spices & Herbs">Spices &amp; Herbs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label>Price per Unit (₹) *</label>
+                        <input type="number" id="fc_price" placeholder="e.g. 30" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <select id="fc_unit">
+                            <option value="kg">kg</option>
+                            <option value="quintal">quintal</option>
+                            <option value="box">box</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label>Available Stock *</label>
+                        <input type="number" id="fc_stock" placeholder="e.g. 500" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <select id="fc_icon">
+                            <option value="🍅">🍅 Tomato</option>
+                            <option value="🧅">🧅 Onion</option>
+                            <option value="🥔">🥔 Potato</option>
+                            <option value="🍇">🍇 Grapes</option>
+                            <option value="🌾">🌾 Grain</option>
+                            <option value="🌶️">🌶️ Chilli</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Farmer Name &amp; Village *</label>
+                    <input type="text" id="fc_farmer" placeholder="e.g. Ramesh Patel, Anand Gujarat" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Mobile Number (Calling &amp; WhatsApp) *</label>
+                    <input type="tel" id="fc_phone" placeholder="e.g. 9825123456" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" style="padding:12px; font-size:15px; margin-top:10px;">
+                    Publish Listing to Live Marketplace &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Interactive Inquiry & Calculator Modal -->
+    <div class="modal" id="inqModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div style="font-size:36px; text-align:center; margin-bottom:10px;" id="modalEmoji">🍅</div>
+            <h3 style="font-size:22px; text-align:center; margin-bottom:4px;" id="modalTitle">Crop Name</h3>
+            <p style="text-align:center; font-size:13px; color:var(--text-muted); margin-bottom:18px;" id="modalFarmer">Farmer Name</p>
+
+            <!-- Dynamic Calculator -->
+            <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:var(--radius-md); padding:16px; margin-bottom:18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="color:#064e3b; font-size:14px;">Live Cost Calculator:</strong>
+                    <span style="font-size:12px; color:#059669;">Zero Commission</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+                    <div style="flex:1;">
+                        <label style="font-size:11.5px; color:#064e3b;">Quantity Needed (<span id="modalUnit">kg</span>):</label>
+                        <input type="number" id="calcQty" value="10" min="1" oninput="updateModalCalc()" style="background:#fff;">
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-size:11px; text-transform:uppercase; color:#064e3b;">Estimated Total</span>
+                        <div style="font-size:22px; font-weight:800; color:var(--primary-dark);" id="modalTotal">₹0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Direct Contact Actions -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
+                <a id="modalCallBtn" href="#" class="btn btn-call">📞 Direct Call</a>
+                <a id="modalWaBtn" href="#" target="_blank" class="btn btn-whatsapp">💬 WhatsApp Chat</a>
+            </div>
+
+            <hr style="border:none; border-top:1px solid var(--border); margin-bottom:16px;">
+
+            <!-- Quick Inquiry Form -->
+            <form onsubmit="submitModalInquiry(event)">
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" id="buyerName" placeholder="e.g. Amit Kumar" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Contact Phone *</label>
+                    <input type="tel" id="buyerPhone" placeholder="e.g. 9819001122" required>
+                </div>
+                <div class="form-group">
+                    <label>Delivery Area / City</label>
+                    <input type="text" id="buyerLoc" placeholder="e.g. Mumbai / Farm Pickup">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Send Direct Inquiry &rarr;</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container" style="text-align:center;">
+            <p style="font-size:16px; font-weight:700; color:#fff; margin-bottom:8px;">🌱 KisanDirect Digital Farm Marketplace</p>
+            <p style="font-size:13px; color:#64748b; margin-bottom:14px;">Bridging farmers &amp; consumers directly with transparent prices and zero broker commissions.</p>
+            <p style="font-size:12px; color:#475569;">&copy; 2026 KisanDirect Platform. Open Agri Initiative.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Seed initial crops
+        const defaultCrops = [
+            { id: 1, name: "Farm Fresh Organic Tomatoes", category: "Vegetables", price: 28, unit: "kg", stock: 450, emoji: "🍅", organic: true, farmer: "Ramesh Patel", loc: "Boriavi, Anand (Gujarat)", phone: "9825123456" },
+            { id: 2, name: "Green Bell Peppers (Capsicum)", category: "Vegetables", price: 45, unit: "kg", stock: 200, emoji: "🫑", organic: true, farmer: "Ramesh Patel", loc: "Boriavi, Anand (Gujarat)", phone: "9825123456" },
+            { id: 3, name: "Nashik Red Onions (Medium-Large)", category: "Vegetables", price: 26, unit: "kg", stock: 1500, emoji: "🧅", organic: false, farmer: "Sunita Shinde", loc: "Pimpalgaon, Nashik (Maharashtra)", phone: "9422987654" },
+            { id: 4, name: "Seedless Black Grapes (Sharad)", category: "Fruits", price: 85, unit: "kg", stock: 600, emoji: "🍇", organic: true, farmer: "Sunita Shinde", loc: "Pimpalgaon, Nashik (Maharashtra)", phone: "9422987654" },
+            { id: 5, name: "Fresh Pomegranates (Bhagwa)", category: "Fruits", price: 110, unit: "kg", stock: 350, emoji: "🍎", organic: true, farmer: "Sunita Shinde", loc: "Nashik (Maharashtra)", phone: "9422987654" },
+            { id: 6, name: "Sharbati Whole Wheat Grain", category: "Grains & Pulses", price: 42, unit: "kg", stock: 3200, emoji: "🌾", organic: true, farmer: "Balwinder Singh", loc: "Samrala, Ludhiana (Punjab)", phone: "9876501234" },
+            { id: 7, name: "Aromatic Basmati Rice (1121)", category: "Grains & Pulses", price: 95, unit: "kg", stock: 1800, emoji: "🍚", organic: false, farmer: "Balwinder Singh", loc: "Ludhiana (Punjab)", phone: "9876501234" },
+            { id: 8, name: "Organic Mustard Seeds (Sarson)", category: "Spices & Herbs", price: 80, unit: "kg", stock: 400, emoji: "🌱", organic: true, farmer: "Balwinder Singh", loc: "Ludhiana (Punjab)", phone: "9876501234" },
+            { id: 9, name: "Sweet Golden Corn", category: "Vegetables", price: 22, unit: "kg", stock: 800, emoji: "🌽", organic: false, farmer: "Ramesh Patel", loc: "Anand (Gujarat)", phone: "9825123456" },
+            { id: 10, name: "Fresh Spicy Green Chillies", category: "Vegetables", price: 40, unit: "kg", stock: 180, emoji: "🌶️", organic: false, farmer: "Sunita Shinde", loc: "Nashik (Maharashtra)", phone: "9422987654" }
+        ];
+
+        let crops = JSON.parse(localStorage.getItem('kd_crops')) || defaultCrops;
+        let activeCategory = 'All';
+        let currentModalCrop = null;
+
+        function renderCrops() {
+            const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+            const grid = document.getElementById('cropGrid');
+            grid.innerHTML = '';
+
+            const filtered = crops.filter(c => {
+                const matchCat = activeCategory === 'All' ? true : 
+                                 activeCategory === 'Organic' ? c.organic : 
+                                 c.category === activeCategory;
+                const matchText = c.name.toLowerCase().includes(query) || c.farmer.toLowerCase().includes(query) || c.loc.toLowerCase().includes(query);
+                return matchCat && matchText;
+            });
+
+            document.getElementById('cropCountDisplay').textContent = `${crops.length}+`;
+
+            filtered.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'crop-card';
+                card.innerHTML = `
+                    <div class="crop-img">
+                        ${c.emoji}
+                        ${c.organic ? '<span class="organic-tag">🌿 Organic</span>' : ''}
+                        <span class="crop-badge">${c.stock} ${c.unit} Left</span>
+                    </div>
+                    <div class="crop-body">
+                        <div class="crop-cat">${c.category}</div>
+                        <h3 class="crop-name">${c.name}</h3>
+                        <div class="crop-price-box">
+                            <div>
+                                <div class="crop-price">₹${c.price} <span style="font-size:12px;font-weight:400;color:#64748b;">/ ${c.unit}</span></div>
+                            </div>
+                            <div style="font-size:12px; color:#059669; font-weight:700;">Direct Farm Rate</div>
+                        </div>
+                        <div class="farmer-row">
+                            <strong>👨‍🌾 ${c.farmer}</strong>
+                            <div style="color:var(--text-muted); font-size:11.5px; margin-top:2px;">📍 ${c.loc}</div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="tel:${c.phone}" class="btn btn-sm btn-call">📞 Call</a>
+                            <a href="https://wa.me/91${c.phone}?text=${encodeURIComponent('Namaste! I would like to inquire about your ' + c.name + ' listed on KisanDirect.')}" target="_blank" class="btn btn-sm btn-whatsapp">💬 WhatsApp</a>
+                        </div>
+                        <button onclick="openModal(${c.id})" class="btn btn-sm btn-secondary btn-full" style="margin-top:8px;">
+                            📊 Live Calculator &amp; Inquire
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCrops() { renderCrops(); }
+        function setCategory(cat, el) {
+            activeCategory = cat;
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            renderCrops();
+        }
+
+        // Modal Logic
+        function openModal(id) {
+            currentModalCrop = crops.find(c => c.id === id);
+            if (!currentModalCrop) return;
+            document.getElementById('modalEmoji').textContent = currentModalCrop.emoji;
+            document.getElementById('modalTitle').textContent = currentModalCrop.name;
+            document.getElementById('modalFarmer').textContent = `👨‍🌾 ${currentModalCrop.farmer} (${currentModalCrop.loc})`;
+            document.getElementById('modalUnit').textContent = currentModalCrop.unit;
+            document.getElementById('modalCallBtn').href = `tel:${currentModalCrop.phone}`;
+            document.getElementById('modalWaBtn').href = `https://wa.me/91${currentModalCrop.phone}?text=${encodeURIComponent('Namaste! I would like to purchase ' + currentModalCrop.name + ' on KisanDirect.')}`;
+            document.getElementById('calcQty').value = 10;
+            updateModalCalc();
+            document.getElementById('inqModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('inqModal').classList.remove('active');
+        }
+
+        function updateModalCalc() {
+            if (!currentModalCrop) return;
+            const qty = parseFloat(document.getElementById('calcQty').value) || 0;
+            const total = qty * currentModalCrop.price;
+            document.getElementById('modalTotal').textContent = `₹${total.toLocaleString('en-IN')}`;
+        }
+
+        function submitModalInquiry(e) {
+            e.preventDefault();
+            const name = document.getElementById('buyerName').value;
+            const phone = document.getElementById('buyerPhone').value;
+            const qty = document.getElementById('calcQty').value;
+            alert(`🎉 Inquiry Sent!\n\nThank you ${name}! Farmer ${currentModalCrop.farmer} has been alerted for your requirement of ${qty} ${currentModalCrop.unit} ${currentModalCrop.name}.\n\nYou can also click Call or WhatsApp above for instant contact.`);
+            closeModal();
+        }
+
+        // Add Crop
+        function handleNewCrop(e) {
+            e.preventDefault();
+            const newCrop = {
+                id: Date.now(),
+                name: document.getElementById('fc_name').value,
+                category: document.getElementById('fc_cat').value,
+                price: parseFloat(document.getElementById('fc_price').value),
+                unit: document.getElementById('fc_unit').value,
+                stock: parseFloat(document.getElementById('fc_stock').value),
+                emoji: document.getElementById('fc_icon').value,
+                organic: true,
+                farmer: document.getElementById('fc_farmer').value,
+                loc: "Local Hub",
+                phone: document.getElementById('fc_phone').value
+            };
+            crops.unshift(newCrop);
+            localStorage.setItem('kd_crops', JSON.stringify(crops));
+            alert(`✅ Success!\n"${newCrop.name}" is now live on the marketplace!`);
+            document.getElementById('newCropForm').reset();
+            showTab('marketplace');
+        }
+
+        // Tab Navigation
+        function showTab(name) {
+            ['marketplace', 'mandi', 'farmers', 'tips', 'portal'].forEach(t => {
+                document.getElementById(`tab-${t}`).style.display = t === name ? 'block' : 'none';
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(name));
+            });
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+            renderCrops();
+        }
+
+        // Populate Mandi Table
+        const mandiData = [
+            { crop: "Fresh Tomatoes", mandi: "Anand APMC", dist: "Anand (Gujarat)", modal: 32, farmer: 28, save: "13%" },
+            { crop: "Red Onions", mandi: "Lasalgaon Mandi", dist: "Nashik (Maharashtra)", modal: 31, farmer: 26, save: "16%" },
+            { crop: "Green Capsicum", mandi: "Ahmedabad APMC", dist: "Ahmedabad", modal: 52, farmer: 45, save: "14%" },
+            { crop: "Black Grapes", mandi: "Nashik Fruit Mandi", dist: "Nashik", modal: 98, farmer: 85, save: "13%" },
+            { crop: "Sharbati Wheat", mandi: "Khanna Grain Market", dist: "Ludhiana (Punjab)", modal: 46, farmer: 42, save: "9%" },
+            { crop: "Pomegranates", mandi: "Vashi APMC", dist: "Navi Mumbai", modal: 135, farmer: 110, save: "19%" }
+        ];
+
+        const mBody = document.getElementById('mandiTableBody');
+        mandiData.forEach(m => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${m.crop}</strong></td>
+                <td>${m.mandi}</td>
+                <td>${m.dist}</td>
+                <td style="color:#64748b;">₹${m.modal} / kg</td>
+                <td><strong style="color:#059669; font-size:16px;">₹${m.farmer} / kg</strong></td>
+                <td><span style="background:#ecfdf5; color:#047857; padding:3px 8px; border-radius:99px; font-weight:700; font-size:12px;">Direct Save ${m.save}</span></td>
+            `;
+            mBody.appendChild(tr);
+        });
+
+        // Populate Farmers
+        const farmers = [
+            { name: "Ramesh Patel", farm: "Patel Organic Farms", loc: "Boriavi, Anand (Gujarat)", phone: "9825123456", spec: "Tomatoes, Capsicum, Maize with solar drip irrigation." },
+            { name: "Sunita Shinde", farm: "Shinde Agro Orchards", loc: "Pimpalgaon, Nashik (Maharashtra)", phone: "9422987654", spec: "Export table grapes, Nashik red onions, Pomegranates." },
+            { name: "Balwinder Singh", farm: "Green Earth Bio Farms", loc: "Samrala, Ludhiana (Punjab)", phone: "9876501234", spec: "Sharbati wheat, Basmati rice, Mustard seeds." }
+        ];
+
+        const fGrid = document.getElementById('farmersGrid');
+        farmers.forEach(f => {
+            const d = document.createElement('div');
+            d.className = 'crop-card';
+            d.innerHTML = `
+                <div class="crop-img" style="height:90px; font-size:44px;">👨‍🌾</div>
+                <div class="crop-body">
+                    <h3 style="font-size:18px;">${f.name}</h3>
+                    <div style="color:#059669; font-weight:600; font-size:13px;">${f.farm}</div>
+                    <div style="color:var(--text-muted); font-size:12px; margin-top:2px;">📍 ${f.loc}</div>
+                    <p style="font-size:13px; color:#475569; margin:10px 0 16px;">${f.spec}</p>
+                    <div class="card-actions" style="margin-top:auto;">
+                        <a href="tel:${f.phone}" class="btn btn-sm btn-call">📞 Call</a>
+                        <a href="https://wa.me/91${f.phone}" target="_blank" class="btn btn-sm btn-whatsapp">💬 WhatsApp</a>
+                    </div>
+                </div>
+            `;
+            fGrid.appendChild(d);
+        });
+
+        // Populate Tips
+        const tips = [
+            { title: "Direct Farm-to-Consumer Packaging", cat: "Packaging", text: "Grade produce into Grade A and B. Grade A packed in ventilated crates commands a 20-30% premium in direct sales." },
+            { title: "Pricing Without Commission Middlemen", cat: "Pricing", text: "Price 10-15% below supermarket shelf rates. You earn 35% higher than wholesale agents while saving buyers money." },
+            { title: "Natural Pest Protection with Neem", cat: "Agronomy", text: "Prepare a 5% neem seed kernel extract (NSKE) spray for sucking pests like whiteflies. Spray early morning for best results." }
+        ];
+
+        const tGrid = document.getElementById('tipsGrid');
+        tips.forEach(t => {
+            const d = document.createElement('div');
+            d.className = 'crop-card';
+            d.innerHTML = `
+                <div class="crop-body">
+                    <span style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase;">${t.cat}</span>
+                    <h3 style="font-size:17px; margin:6px 0 10px;">${t.title}</h3>
+                    <p style="font-size:13.5px; color:#475569; line-height:1.6;">${t.text}</p>
+                </div>
+            `;
+            tGrid.appendChild(d);
+        });
+
+        // Initial render
+        renderCrops();
+    </script>
+</body>
+</html>
